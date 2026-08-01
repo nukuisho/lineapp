@@ -1,104 +1,412 @@
 # AGENTS.md
 
-## Project purpose
+## 1. このファイルの目的
 
-This repository contains a LINE LIFF application for recording agricultural volunteer participation by scanning a QR code displayed at a farm.
+このファイルは、Codexを含む開発者が本リポジトリで作業する際の共通ルールを定義する。
 
-The application records participation history and grants digital stamps. It is not an employee attendance or payroll system.
+実装を開始する前に、必ず次のファイルを確認すること。
 
-## Sources of truth
+1. `AGENTS.md`
+2. `requirements.md`
+3. `official-references.md`
+4. `README.md`
+5. 既存のソースコードと設定ファイル
 
-When implementing LINE-related features, use the following priority order:
+---
 
-1. Current LINE Developers official documentation
-2. Official repositories under the `line` GitHub organization
-3. Documentation in this repository
-4. Existing implementation in this repository
-5. General knowledge or assumptions
+## 2. プロジェクト概要
 
-Do not implement LINE API behavior based only on memory.
+本リポジトリでは、援農ボランティアの参加実績を記録するLINE LIFFアプリを開発する。
 
-If the official documentation conflicts with this repository, report the conflict before changing the implementation.
+農家が圃場に掲示したQRコードをボランティアが読み込み、LINE内で参加登録を行う。
 
-## Official references
+参加登録後は、次の情報を記録する。
 
-Consult `docs/official-references.md` before implementing or changing:
+* 参加したボランティア
+* 参加した農園
+* 作業日
+* 作業内容
+* 作業時間区分
+* 付与されたデジタルスタンプ
 
-* LIFF initialization
-* LINE Login
-* ID token handling
-* Access token handling
-* User profile retrieval
-* Messaging API
-* LIFF browser behavior
-* LIFF endpoint URLs
-* LINE webhook processing
+本システムは、勤怠管理、給与計算、人事評価を目的としない。
 
-## Required official repositories
+---
 
-Use the following official repositories as references:
+## 3. MVPの技術構成
 
-* `line/line-liff-v2-starter`
-* `line/line-bot-sdk-nodejs`
-* `line/liff-playground`
-* `line/liff-mock`
-* `line/liff-inspector`
+本プロジェクトのMVPでは、次の技術を使用する。
 
-Do not copy code from archived or unofficial repositories without explaining why it is needed.
+* Webアプリ：Next.js
+* 言語：TypeScript
+* LINE連携：LIFF SDK
+* データベース：Firebase Firestore
+* UI：通常のCSSまたはTailwind CSS
+* 公開先：Vercel
+* LINE側の設定：LINE Developers
 
-## Authentication and security
+MVPでは、次の技術やサービスは原則として使用しない。
 
-* Never trust a LINE user ID sent directly by the client.
-* Verify LINE ID tokens or access tokens on the server.
-* Never expose the LINE channel secret or channel access token to the browser.
-* Store secrets only in environment variables.
-* Never commit `.env.local` or production credentials.
-* Do not place access tokens, user IDs, or secrets in LIFF URLs or QR codes.
-* Treat the farm QR token as an identifier, not as proof of user identity.
-* Prevent duplicate participation records on the server.
-* Perform authorization and validation on the server, not only in the UI.
+* 独立したバックエンドサーバー
+* Firebase Authentication
+* Reduxなどの複雑な状態管理ライブラリ
+* LINE Messaging API
+* shadcn/uiなどの追加UIライブラリ
+* 有料の外部サービス
+* マイクロサービス構成
 
-## QR check-in rules
+追加技術が必要な場合は、導入前に次を説明すること。
 
-* QR codes contain only a random farm check-in token.
-* Do not use sequential farm IDs in public QR codes.
-* Scanning a QR code must not immediately create a participation record.
-* Display the farm name and require explicit confirmation.
-* Reject inactive farms and invalid tokens.
-* Prevent duplicate check-ins according to the rule documented in `docs/qr-check-in.md`.
+* 導入目的
+* 既存構成では実現できない理由
+* 追加される依存関係
+* 保守への影響
+* 代替案
 
-## Firestore rules
+---
 
-* Keep server-side Firestore access separate from browser-side access.
-* Do not assume Firestore Security Rules protect requests made through the Firebase Admin SDK.
-* Use server-side validation for all participation writes.
-* Use transactions or another atomic operation when creating participation records and updating stamp totals.
-* Do not maintain counters in multiple places without an explicit consistency strategy.
+## 4. 情報源の優先順位
 
-## Development rules
+LINEまたはFirebaseの仕様に関係する実装では、次の順番で情報を参照する。
 
-* Use TypeScript.
-* Avoid `any` unless a reason is documented.
-* Keep LINE-specific code in isolated modules.
-* Keep business logic independent from UI components.
-* Validate all API request bodies.
-* Add tests for authentication, invalid QR tokens, duplicate check-ins, and stamp updates.
-* Run lint, type checking, and tests after changes.
-* Report commands that could not be run.
-* Do not replace the existing architecture without explaining the migration impact.
+1. 現在の公式ドキュメント
+2. LINEまたはFirebaseが公開する公式GitHubリポジトリ
+3. `official-references.md`
+4. `requirements.md`
+5. 本リポジトリの既存実装
+6. 一般的な知識や推測
 
-## Documentation rules
+古い記憶や一般的な実装例だけを根拠に、LINEやFirebaseの仕様を実装してはならない。
 
-When adding a LINE-dependent implementation:
+公式仕様と本リポジトリの記述に矛盾がある場合は、勝手に変更せず、次を報告すること。
 
-1. Add the official reference to `docs/official-references.md`.
-2. Record the relevant access date.
-3. Explain any assumptions.
-4. Add or update tests.
-5. Update the applicable design document.
+* 矛盾している箇所
+* 公式仕様の内容
+* 既存設計への影響
+* 推奨する修正案
 
-## Language
+---
 
-* UI text and user-facing errors: Japanese
-* Source code identifiers: English
-* Technical documentation: Japanese unless an existing file uses English
+## 5. 実装の基本方針
+
+### 5.1 小さく実装する
+
+一度に多数の機能を追加せず、次の単位で段階的に実装する。
+
+1. LIFFの起動
+2. LINEユーザーの識別
+3. 農園情報の取得
+4. 参加登録
+5. 重複登録防止
+6. スタンプ付与
+7. 参加履歴表示
+
+各段階で、動作確認、型チェック、テストを行う。
+
+### 5.2 既存構成を尊重する
+
+既存のファイル構成、依存関係、命名規則を確認してから変更する。
+
+次の操作は、影響を説明せずに行ってはならない。
+
+* 既存ファイルの大量削除
+* フレームワークの変更
+* データモデルの全面変更
+* package.jsonの大幅な変更
+* ディレクトリ構造の全面変更
+* 主要ライブラリの置換
+
+### 5.3 過剰設計を避ける
+
+MVPに必要のない抽象化や機能を追加しない。
+
+避ける例：
+
+* 使用予定のない汎用プラグイン機構
+* 複雑な権限管理フレームワーク
+* 不要なRepository層の多重化
+* 将来機能のためだけの大量の空ファイル
+* 必要性が説明できないデザインパターン
+* 不要な状態管理ライブラリ
+
+---
+
+## 6. LINE認証ルール
+
+### 6.1 ユーザー識別
+
+LIFF SDKを利用してLINEユーザーを識別する。
+
+クライアントから送信された次の値を、そのまま信用してはならない。
+
+* LINEユーザーID
+* 表示名
+* プロフィール画像URL
+* 認証済みであるというフラグ
+
+サーバー側では、LINEのIDトークンまたはアクセストークンを検証する。
+
+### 6.2 秘密情報
+
+次の情報をブラウザ側へ公開してはならない。
+
+* LINEチャネルシークレット
+* LINEチャネルアクセストークン
+* Firebase Admin SDKの秘密鍵
+* Firebaseサービスアカウント秘密鍵
+* その他のサーバー用秘密情報
+
+秘密情報は環境変数で管理する。
+
+### 6.3 環境変数
+
+最低限、次の環境変数を想定する。
+
+```text
+NEXT_PUBLIC_LIFF_ID
+LINE_CHANNEL_ID
+LINE_CHANNEL_SECRET
+FIREBASE_PROJECT_ID
+FIREBASE_CLIENT_EMAIL
+FIREBASE_PRIVATE_KEY
+```
+
+公開してよい値だけに`NEXT_PUBLIC_`を付ける。
+
+`.env.local`はGit管理対象外とする。
+
+`.env.example`には、実際の秘密情報を記載しない。
+
+---
+
+## 7. QRコードのルール
+
+QRコードには、推測可能な農園の連番IDを直接含めない。
+
+農園ごとにランダムな`qrToken`を発行する。
+
+想定URL：
+
+```text
+https://example.com/check-in?token={qrToken}
+```
+
+または、LIFF URLを使用する。
+
+```text
+https://liff.line.me/{LIFF_ID}/check-in?token={qrToken}
+```
+
+QRコードを読み込んだだけでは参加登録を確定しない。
+
+必ず次の流れにする。
+
+1. QRコードを読み込む
+2. 農園名を表示する
+3. 作業内容を選択する
+4. 作業時間区分を選択する
+5. 利用者が登録ボタンを押す
+6. サーバー側で検証する
+7. 参加履歴を保存する
+
+無効なトークン、存在しない農園、利用停止中の農園では登録を行わない。
+
+---
+
+## 8. Firestoreのルール
+
+### 8.1 基本方針
+
+Firestoreへの重要な書き込みは、Next.jsのサーバー処理から行う。
+
+クライアントからFirestoreへ直接、参加履歴を書き込ませない。
+
+### 8.2 参加登録
+
+参加登録時には、次を一体の処理として扱う。
+
+* 参加履歴の作成
+* 累計参加回数の更新
+* 累計スタンプ数の更新
+
+可能な限り、Firestore Transactionを使用する。
+
+次の不整合を発生させてはならない。
+
+* 参加履歴はあるが、スタンプが増えていない
+* スタンプは増えているが、参加履歴がない
+* 二重登録によってスタンプだけ複数回増える
+
+### 8.3 重複登録
+
+MVPでは、次の組み合わせを重複判定に使用する。
+
+```text
+userId + farmId + workDate
+```
+
+同じユーザーが、同じ農園に、同じ日付で複数回登録できないようにする。
+
+重複判定はサーバー側で行う。
+
+ボタンの無効化だけを重複防止策としてはならない。
+
+将来的に午前と午後を別参加として扱えるよう、判定条件は変更しやすくする。
+
+---
+
+## 9. TypeScriptのルール
+
+* 原則としてTypeScriptを使用する
+* `any`の使用を避ける
+* APIの入力値に型だけでなく実行時検証を行う
+* LINE APIのレスポンス型を適切に定義する
+* Firestoreのドキュメント型を定義する
+* nullおよびundefinedを明示的に扱う
+* 型アサーションを多用しない
+* 外部データを型安全と仮定しない
+
+必要に応じて、Zodなどの軽量な入力検証ライブラリを使用してよい。
+
+ただし、新しい依存関係を追加する場合は目的を説明すること。
+
+---
+
+## 10. UIのルール
+
+### 10.1 基本方針
+
+UIはスマートフォン表示を最優先とする。
+
+主な利用環境はLINE内ブラウザとする。
+
+### 10.2 デザイン
+
+* 緑色を基本色とする
+* 明るく親しみやすいデザインにする
+* 果樹園や地域活動を感じる表現にする
+* 果物の絵文字やアイコンは補助的に使用する
+* 子ども向けに見えすぎないようにする
+* ランキングや競争を強調しない
+* 高齢者でも読みやすい文字サイズにする
+* ボタンを十分な大きさにする
+* 重要な操作を一画面に詰め込みすぎない
+
+### 10.3 操作性
+
+* 登録ボタンの二重押下を防止する
+* 処理中であることを表示する
+* 成功または失敗を明確に表示する
+* エラー時に次の操作を案内する
+* 内部エラーの詳細を利用者に表示しない
+
+---
+
+## 11. ディレクトリ構成
+
+既存構成がない場合は、次のような単純な構成を推奨する。
+
+```text
+src/
+├── app/
+│   ├── page.tsx
+│   ├── check-in/
+│   ├── history/
+│   └── api/
+├── components/
+├── lib/
+│   ├── line/
+│   ├── firebase/
+│   └── validation/
+├── types/
+└── styles/
+```
+
+役割：
+
+* `app/`：画面およびRoute Handlers
+* `components/`：共通UI
+* `lib/line/`：LIFFおよびLINE認証処理
+* `lib/firebase/`：Firestore接続処理
+* `lib/validation/`：入力検証
+* `types/`：共通型定義
+* `styles/`：共通スタイル
+
+必要以上にディレクトリを増やさない。
+
+---
+
+## 12. テストルール
+
+少なくとも次をテストする。
+
+* 有効なQRトークンで農園を取得できる
+* 無効なQRトークンを拒否できる
+* 利用停止中の農園を拒否できる
+* 新規LINEユーザーを登録できる
+* 既存ユーザーを再利用できる
+* 参加履歴を保存できる
+* 重複登録を防止できる
+* スタンプが正しく加算される
+* 不正な作業内容を拒否できる
+* 不正な作業時間区分を拒否できる
+* 他人の参加履歴を取得できない
+* 登録失敗時に集計値だけ更新されない
+
+テストを実行できなかった場合は、理由を報告する。
+
+---
+
+## 13. 実行確認
+
+変更後は、利用可能な範囲で次を実行する。
+
+```bash
+npm run lint
+npm run typecheck
+npm test
+npm run build
+```
+
+実際のスクリプト名が異なる場合は、`package.json`を確認して適切なコマンドを使用する。
+
+実行できなかったコマンドは、実行済みとして報告してはならない。
+
+---
+
+## 14. ドキュメント更新
+
+次の場合は、関連する文書も更新する。
+
+* 技術構成を変更した
+* 環境変数を追加した
+* LINE認証方法を変更した
+* Firestoreのデータ構造を変更した
+* 重複判定ルールを変更した
+* QRコードの形式を変更した
+* MVPの対象範囲を変更した
+
+主な更新対象：
+
+* `README.md`
+* `requirements.md`
+* `official-references.md`
+* `.env.example`
+
+---
+
+## 15. Codexの作業報告形式
+
+作業後は、次の順番で報告する。
+
+1. 実施した内容
+2. 変更したファイル
+3. 主な実装判断
+4. 実行した確認コマンド
+5. テスト結果
+6. 未解決事項
+7. 次に推奨する作業
+
+実装していない内容を、実装済みとして報告してはならない。
+
+推測、仮定、未確認事項は明確に区別する。
