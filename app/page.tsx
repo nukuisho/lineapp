@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { LiffStatus } from "../src/components/liff-status";
 import { ParticipationStamps } from "../src/components/participation-stamps";
 import { mockUser } from "../src/lib/mock-data";
 import { getPrototypeParticipations } from "../src/lib/prototype-storage";
@@ -46,6 +47,17 @@ export default function HomePage() {
             ボランティアの参加を記録する
             LINE内の簡単登録アプリです
           </p>
+        </section>
+
+        <section
+          className="card"
+          aria-labelledby="line-status-title"
+        >
+          <h2 id="line-status-title">
+            LINE連携状態
+          </h2>
+
+          <LiffStatus />
         </section>
 
         <section
