@@ -10,6 +10,7 @@ type LiffState =
   | {
       status: "ready";
       isInClient: boolean;
+      isLoggedIn: boolean;
     }
   | {
       status: "error";
@@ -30,9 +31,10 @@ export function LiffStatus() {
           return;
         }
 
-        setState({
+setState({
           status: "ready",
           isInClient: liff.isInClient(),
+          isLoggedIn: liff.isLoggedIn(),
         });
       },
       () => {
@@ -88,10 +90,10 @@ export function LiffStatus() {
         LINE連携の準備ができました。
       </p>
 
-      <p className="prototype-note">
-        {state.isInClient
-          ? "LINEアプリ内で開いています。"
-          : "外部ブラウザで開いています。"}
+<p className="prototype-note">
+        {state.isLoggedIn
+          ? "LINEにログイン済みです。"
+          : "LINEにログインしていません。"}
       </p>
     </div>
   );
