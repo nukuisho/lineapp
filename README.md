@@ -20,6 +20,7 @@
 - Node.js 20.9.0以上
 - Next.js 16.2.12
 - React 18.3.1
+- LIFF SDK 2.29.2
 - TypeScript 5.5.4
 - ESLint 9
 - Vitest 4.1.10
@@ -31,12 +32,41 @@ npm run lint
 npm run typecheck
 npm test
 npm run build
+```
+
 ## ローカル起動方法
+
+環境変数の設定例をコピーする。
+
+```bash
+cp .env.example .env.local
+```
+
+`.env.local`の`NEXT_PUBLIC_LIFF_ID`へ、LINE Developers Consoleで発行されたLIFF IDを設定する。
+
+```env
+NEXT_PUBLIC_LIFF_ID=your-liff-id
+```
+
+LIFF URL全体ではなく、LIFF IDだけを設定する。`.env.local`はGit管理対象外であり、実際のLIFF IDを`.env.example`へ記載しない。
+
+依存関係をインストールし、開発サーバーを起動する。
 
 ```bash
 npm install
 npm run dev
 ```
+
+## Vercel環境変数
+
+VercelのProduction環境には、次を設定する。
+
+```env
+NEXT_PUBLIC_LIFF_ID=your-liff-id
+```
+
+`NEXT_PUBLIC_LIFF_ID`はブラウザ側でLIFF SDKを初期化するための公開可能な識別子である。LINE Channel Secretなどのサーバー用秘密情報には`NEXT_PUBLIC_`を付けない。
+
 ## 暫定的なビルド・依存関係設定
 
 Next.js 16.2.12のTurbopackによる本番ビルドでは、`/_not-found`のページデータ収集エラーが発生したため、現在の`npm run build`はWebpackを明示的に使用する。
@@ -55,7 +85,7 @@ Next.jsを更新する際は、次を再確認する。
 - データベースには保存しません。
 - 参加記録はUI確認用として、現在のブラウザのlocalStorageだけに保存します。
 - 参加登録はサーバーへ送信せず、ダミーデータとブラウザ内保存を使用する試作品です。
-- 次段階では、Firestore接続、農園情報取得、履歴保存、重複登録防止、LINE LIFF連携を実装します。
+- 次段階では、LINEログイン状態確認、プロフィール仮表示、IDトークンのサーバー検証、Firestore接続、農園情報取得、履歴保存、重複登録防止を実装します。
 
 ## 2026-08-02 UI試作品の方針変更
 
