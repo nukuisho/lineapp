@@ -15,18 +15,46 @@
 - /check-in/complete: 登録完了画面
 - /history: 参加履歴画面
 - /error: エラー画面
+## 開発環境
 
+- Node.js 20.9.0以上
+- Next.js 16.2.12
+- React 18.3.1
+- TypeScript 5.5.4
+- ESLint 9
+- Vitest 4.1.10
+
+## 確認コマンド
+
+```bash
+npm run lint
+npm run typecheck
+npm test
+npm run build
 ## ローカル起動方法
 
 ```bash
 npm install
 npm run dev
 ```
+## 暫定的なビルド・依存関係設定
+
+Next.js 16.2.12のTurbopackによる本番ビルドでは、`/_not-found`のページデータ収集エラーが発生したため、現在の`npm run build`はWebpackを明示的に使用する。
+
+Next.js 16.2.12が指定するPostCSSおよびsharpのバージョンに対するnpmセキュリティ監査対応として、`package.json`の`overrides`でPostCSS 8.5.25とsharp 0.35.3を使用している。
+
+Next.jsを更新する際は、次を再確認する。
+
+- Turbopackで本番ビルドできるか
+- Webpackの明示指定を削除できるか
+- PostCSSおよびsharpの`overrides`を削除できるか
+- `npm audit --omit=dev`と`npm audit`がともに成功するか
 
 ## 制約
 
-- データベースやlocalStorageには保存しません。
-- 参加登録はダミー画面遷移による試作品です。
+- データベースには保存しません。
+- 参加記録はUI確認用として、現在のブラウザのlocalStorageだけに保存します。
+- 参加登録はサーバーへ送信せず、ダミーデータとブラウザ内保存を使用する試作品です。
 - 次段階では、Firestore接続、農園情報取得、履歴保存、重複登録防止、LINE LIFF連携を実装します。
 
 ## 2026-08-02 UI試作品の方針変更
