@@ -1,0 +1,1953 @@
+:root {
+  color-scheme: light;
+
+  --color-background: #f7f3e7;
+  --color-surface: #ffffff;
+  --color-surface-soft: #fffbef;
+  --color-primary: #d5a526;
+  --color-primary-dark: #9b6f0d;
+  --color-primary-soft: #f7e7a5;
+  --color-text: #342f22;
+  --color-text-soft: #716957;
+  --color-border: #e6dcc1;
+  --color-border-strong: #d9c27a;
+  --color-success: #3f6f4c;
+  --color-error: #a63f35;
+  --color-focus: #805f10;
+
+  --radius-small: 10px;
+  --radius-medium: 16px;
+  --radius-large: 22px;
+  --radius-pill: 999px;
+
+  --shadow-small:
+    0 3px 10px rgba(70, 57, 24, 0.06);
+  --shadow-card:
+    0 10px 30px rgba(70, 57, 24, 0.08);
+  --shadow-button:
+    0 5px 12px rgba(133, 94, 10, 0.14);
+
+  font-family:
+    "Noto Sans JP",
+    "Hiragino Sans",
+    "Yu Gothic",
+    sans-serif;
+
+  background: var(--color-background);
+  color: var(--color-text);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  background: var(--color-background);
+  scroll-behavior: smooth;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  background:
+    radial-gradient(
+      circle at 50% -10%,
+      #fffdf6 0%,
+      var(--color-background) 52%
+    );
+  color: var(--color-text);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button,
+a,
+select,
+input {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:focus-visible,
+a:focus-visible,
+select:focus-visible,
+input:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid rgba(128, 95, 16, 0.42);
+  outline-offset: 3px;
+}
+
+h1,
+h2,
+h3,
+p {
+  overflow-wrap: anywhere;
+}
+
+h1,
+h2,
+h3 {
+  color: var(--color-text);
+  line-height: 1.4;
+}
+
+h1 {
+  font-size: 1.72rem;
+}
+
+h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  letter-spacing: 0.01em;
+}
+
+h3 {
+  font-size: 1.02rem;
+}
+
+/* ページ全体 */
+main {
+  width: min(100%, 480px);
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 20px 16px 44px;
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 17px;
+}
+
+/* 共通カード */
+.card {
+  padding: 19px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-large);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.card > h2:first-child {
+  position: relative;
+  padding-bottom: 9px;
+}
+
+.card > h2:first-child::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 34px;
+  height: 3px;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary);
+}
+
+/* ヘッダー */
+.hero {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-start;
+  flex-direction: column;
+  min-height: 190px;
+  padding: 19px;
+  overflow: hidden;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 24px;
+  background-color: #efc84e;
+  background-image:
+    linear-gradient(
+      90deg,
+      #efc84e 0%,
+      #efc84e 42%,
+      rgba(239, 200, 78, 0.93) 49%,
+      rgba(239, 200, 78, 0.26) 66%,
+      rgba(239, 200, 78, 0) 83%
+    ),
+    url("/stamp-character.png");
+  background-repeat: no-repeat;
+  background-position:
+    left center,
+    calc(100% + 38px) center;
+  background-size:
+    100% 100%,
+    50% auto;
+  box-shadow:
+    0 12px 30px rgba(86, 64, 10, 0.14);
+}
+
+.hero::after {
+  display: none;
+}
+
+.hero h1,
+.hero h2,
+.hero p {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 76%;
+  color: #42330c;
+  text-shadow: none;
+}
+
+.hero h1,
+.hero h2 {
+  margin: 0;
+}
+
+.hero h1 {
+  font-size: 1.72rem;
+  line-height: 1.3;
+  letter-spacing: 0.025em;
+}
+
+.hero p {
+  margin: 9px 0 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+/* 利用者サマリー */
+.welcome-message {
+  margin: 6px 0 0;
+  color: var(--color-text-soft);
+  font-size: 0.94rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 11px;
+  margin-top: 14px;
+}
+
+.stat-pill {
+  padding: 13px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-medium);
+  background: var(--color-surface-soft);
+  text-align: center;
+}
+
+.stat-pill strong {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--color-primary-dark);
+  font-size: 1.35rem;
+}
+
+.stat-pill span {
+  color: var(--color-text-soft);
+  font-size: 0.83rem;
+}
+
+/* ボタン */
+.link-button,
+.primary-button,
+.secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 52px;
+  padding: 12px 18px;
+  border: 2px solid transparent;
+  border-radius: var(--radius-pill);
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1.4;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.primary-button {
+  border-color: #c99516;
+  background: var(--color-primary);
+  color: #2f260f;
+  box-shadow: var(--shadow-button);
+}
+
+.primary-button:hover {
+  background: #e0b43a;
+  transform: translateY(-1px);
+}
+
+.primary-button:active {
+  transform: translateY(0);
+}
+
+.primary-button:disabled {
+  opacity: 0.62;
+  cursor: wait;
+  transform: none;
+}
+
+.secondary-button {
+  border-color: var(--color-border-strong);
+  background: var(--color-surface-soft);
+  color: #685015;
+}
+
+.secondary-button:hover {
+  border-color: #c9aa4d;
+  background: #fff5cb;
+}
+
+/* フォーム */
+.fieldset {
+  margin: 0;
+  padding: 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-medium);
+  background: var(--color-surface-soft);
+}
+
+.legend {
+  padding: 0 7px;
+  color: #59440e;
+  font-weight: 800;
+}
+
+.field-row {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-top: 13px;
+}
+
+label {
+  color: #474031;
+  font-size: 0.94rem;
+  font-weight: 750;
+}
+
+select,
+input {
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 12px;
+  border: 1px solid #d7ccb0;
+  border-radius: 12px;
+  background: #ffffff;
+  color: var(--color-text);
+}
+
+select:hover,
+input:hover {
+  border-color: #c6ad68;
+}
+
+.error-text {
+  margin: 0;
+  color: var(--color-error);
+  font-size: 0.9rem;
+  font-weight: 650;
+}
+
+/* 一覧 */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.quick-actions,
+.recent-history-list,
+.record-summary {
+  margin-top: 14px;
+}
+
+.list-item {
+  padding: 13px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-medium);
+  background: var(--color-surface-soft);
+}
+
+.list-item h3,
+.list-item p {
+  margin: 0;
+}
+
+.list-item h3 {
+  color: #4b3d18;
+}
+
+.list-item p {
+  color: var(--color-text-soft);
+  font-size: 0.91rem;
+}
+
+.list-item p + p {
+  margin-top: 4px;
+}
+
+/* 登録完了サマリー */
+.summary-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.summary-list li {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 11px 0;
+  border-bottom:
+    1px solid var(--color-border);
+}
+
+.summary-list li:last-child {
+  border-bottom: 0;
+}
+
+.summary-list span {
+  flex: 0 0 auto;
+  color: var(--color-text-soft);
+}
+
+.summary-list strong {
+  color: #423714;
+  text-align: right;
+}
+
+.inline-link {
+  color: var(--color-primary-dark);
+  font-weight: 800;
+  text-decoration: underline;
+  text-decoration-color:
+    rgba(155, 111, 13, 0.3);
+  text-underline-offset: 3px;
+}
+
+/* 参加スタンプカード */
+.participation-card,
+.modern-participation-card,
+.character-participation-card,
+.pear-participation-card {
+  margin-top: 16px;
+  padding: 18px;
+  overflow: hidden;
+  border: 1px solid #e3cf8d;
+  border-radius: 20px;
+  background: #fff9dc;
+  box-shadow: none;
+}
+
+.participation-card-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.participation-card-label,
+.modern-stamp-eyebrow {
+  margin: 0;
+  color: #9b7514;
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+}
+
+.participation-card-heading h2,
+.modern-stamp-heading h2 {
+  margin: 2px 0 0;
+  color: #55420f;
+  font-size: 1.18rem;
+}
+
+.participation-total {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: baseline;
+  gap: 3px;
+  margin: 0;
+  color: #755612;
+}
+
+.participation-total strong {
+  font-size: 2.1rem;
+  line-height: 1;
+}
+
+.participation-description,
+.modern-stamp-description {
+  margin: 9px 0 0;
+  color: #75663f;
+  font-size: 0.88rem;
+}
+
+.modern-stamp-heading {
+  text-align: center;
+}
+
+/* フラットな黄色スタンプ */
+.modern-stamp {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  width: 176px;
+  height: 176px;
+  margin: 19px auto 3px;
+  overflow: hidden;
+  border: 5px solid #cf9815;
+  border-radius: 50%;
+  background: #efc84e;
+  color: #4e3a0c;
+  box-shadow: none;
+}
+
+/* 葉の透かし */
+.modern-stamp::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  top: 47px;
+  left: 44px;
+  width: 88px;
+  height: 42px;
+  border: 3px solid
+    rgba(88, 66, 13, 0.12);
+  border-radius:
+    100% 0 100% 0;
+  background:
+    rgba(255, 255, 255, 0.08);
+  transform: rotate(-32deg);
+}
+
+.modern-stamp::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  top: 79px;
+  left: 80px;
+  width: 65px;
+  height: 2px;
+  background:
+    rgba(88, 66, 13, 0.14);
+  transform: rotate(-32deg);
+  transform-origin: left center;
+}
+
+.modern-stamp-top,
+.modern-stamp-decoration {
+  display: none;
+}
+
+.modern-stamp-number,
+.modern-stamp-unit {
+  position: relative;
+  z-index: 1;
+}
+
+.modern-stamp-number {
+  margin: 0;
+  color: #49360a;
+  font-family:
+    "Arial Black",
+    "Helvetica Neue",
+    sans-serif;
+  font-size: 5.2rem;
+  font-weight: 900;
+  line-height: 0.92;
+  letter-spacing: -0.06em;
+  text-indent: -0.06em;
+  text-shadow: none;
+}
+
+.modern-stamp-unit {
+  margin-top: 8px;
+  color: #5c460f;
+  font-size: 0.98rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-indent: 0;
+}
+
+/* 処理中表示 */
+.loading-indicator,
+[aria-busy="true"] {
+  cursor: wait;
+}
+
+/* 小さいスマートフォン */
+@media (max-width: 360px) {
+  main {
+    padding:
+      14px 10px 30px;
+  }
+
+  .page {
+    gap: 14px;
+  }
+
+  .card {
+    padding: 15px;
+    border-radius: 18px;
+  }
+
+  .hero {
+    min-height: 174px;
+    padding: 16px;
+    background-position:
+      left center,
+      calc(100% + 34px) center;
+    background-size:
+      100% 100%,
+      54% auto;
+  }
+
+  .hero h1,
+  .hero h2,
+  .hero p {
+    max-width: 80%;
+  }
+
+  .hero h1 {
+    font-size: 1.45rem;
+  }
+
+  .hero p {
+    font-size: 0.82rem;
+  }
+
+  .stats-grid {
+    gap: 8px;
+  }
+
+  .stat-pill {
+    padding: 11px 7px;
+  }
+
+  .primary-button,
+  .secondary-button {
+    min-height: 50px;
+  }
+
+  .participation-card,
+  .modern-participation-card,
+  .character-participation-card,
+  .pear-participation-card {
+    padding: 14px;
+  }
+
+  .modern-stamp {
+    width: 158px;
+    height: 158px;
+  }
+
+  .modern-stamp-number {
+    font-size: 4.65rem;
+  }
+
+  .modern-stamp::before {
+    top: 42px;
+    left: 39px;
+    width: 80px;
+    height: 38px;
+  }
+
+  .modern-stamp::after {
+    top: 71px;
+    left: 72px;
+    width: 58px;
+  }
+
+  .summary-list li {
+    gap: 10px;
+  }
+}
+
+/* 動きを抑える設定への対応 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+}
+
+/* 最終調整：明るい黄色を基調にしたカラーパレット */
+:root {
+  --color-background: #fffbea;
+  --color-surface: #ffffff;
+  --color-surface-soft: #fffdf3;
+  --color-primary: #f1c93f;
+  --color-primary-dark: #806500;
+  --color-primary-soft: #fff0a8;
+  --color-text: #30332c;
+  --color-text-soft: #666a60;
+  --color-border: #eadfba;
+  --color-border-strong: #ddc65d;
+  --color-success: #487054;
+  --color-error: #a53e35;
+  --color-focus: #896d00;
+}
+
+html {
+  background: #fffbea;
+}
+
+body {
+  background:
+    radial-gradient(
+      circle at 50% -10%,
+      #ffffff 0%,
+      #fffbea 48%,
+      #fff6cd 100%
+    );
+  color: #30332c;
+}
+
+h1,
+h2,
+h3 {
+  color: #30332c;
+}
+
+/* カードの茶色味を抑える */
+.card {
+  border-color: #eadfba;
+  background: #ffffff;
+  box-shadow:
+    0 10px 28px rgba(107, 91, 20, 0.07);
+}
+
+.card > h2:first-child::after {
+  background: #efc63b;
+}
+
+/* ヘッダー本体は薄い黄色 */
+.hero {
+  position: relative;
+  isolation: isolate;
+  min-height: 190px;
+  overflow: hidden;
+  padding: 19px;
+  border-color: #e2ca60;
+  background: #fff0a6;
+  color: #30332c;
+  box-shadow:
+    0 10px 26px rgba(121, 100, 12, 0.1);
+}
+
+/* 画像を独立させ、透明度70%、幅60%で右寄せ */
+.hero::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  right: -34px;
+  bottom: 0;
+  display: block;
+  width: 60%;
+  background-image:
+    url("/stamp-character.png");
+  background-repeat: no-repeat;
+  background-position: right center;
+  background-size: contain;
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* 左側の文字を読みやすくする薄い黄色のグラデーション */
+.hero::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255, 240, 166, 1) 0%,
+      rgba(255, 240, 166, 0.98) 35%,
+      rgba(255, 240, 166, 0.76) 53%,
+      rgba(255, 240, 166, 0.22) 76%,
+      rgba(255, 240, 166, 0) 100%
+    );
+  pointer-events: none;
+}
+
+.hero h1,
+.hero h2,
+.hero p {
+  position: relative;
+  z-index: 2;
+  color: #30332c;
+  text-shadow: none;
+}
+
+.hero h1 {
+  color: #272a25;
+}
+
+.hero p {
+  color: #4e524a;
+}
+
+/* ボタンを明るい黄色へ統一 */
+.primary-button {
+  border-color: #d7ad1d;
+  background: #f1c93f;
+  color: #292a25;
+  box-shadow:
+    0 5px 12px rgba(154, 119, 0, 0.13);
+}
+
+.primary-button:hover {
+  border-color: #cda315;
+  background: #f5d453;
+}
+
+.secondary-button {
+  border-color: #e1cc71;
+  background: #fff8d4;
+  color: #57523e;
+}
+
+.secondary-button:hover {
+  border-color: #d8bc4e;
+  background: #fff1ad;
+}
+
+/* 利用者サマリーと一覧 */
+.stat-pill,
+.list-item,
+.fieldset {
+  border-color: #eadfba;
+  background: #fffdf3;
+}
+
+.stat-pill strong {
+  color: #735f00;
+}
+
+.stat-pill span,
+.list-item p {
+  color: #666a60;
+}
+
+.list-item h3 {
+  color: #34372f;
+}
+
+/* フォーム */
+.legend {
+  color: #4d5048;
+}
+
+label {
+  color: #464a42;
+}
+
+select,
+input {
+  border-color: #ddd4b7;
+  color: #30332c;
+}
+
+select:hover,
+input:hover {
+  border-color: #d2bb5b;
+}
+
+/* 完了画面 */
+.summary-list li {
+  border-bottom-color: #eee5c9;
+}
+
+.summary-list span {
+  color: #6a6e65;
+}
+
+.summary-list strong {
+  color: #30332c;
+}
+
+.inline-link {
+  color: #786100;
+  text-decoration-color:
+    rgba(120, 97, 0, 0.28);
+}
+
+/* スタンプカードも明るい黄色へ統一 */
+.participation-card,
+.modern-participation-card,
+.character-participation-card,
+.pear-participation-card {
+  border-color: #e2cc72;
+  background: #fff8d2;
+}
+
+.participation-card-heading h2,
+.modern-stamp-heading h2 {
+  color: #30332c;
+}
+
+.participation-card-label,
+.modern-stamp-eyebrow {
+  color: #856d00;
+}
+
+.participation-description,
+.modern-stamp-description {
+  color: #64685f;
+}
+
+.participation-total {
+  color: #6f5b00;
+}
+
+/* フラットな黄色スタンプ */
+.modern-stamp {
+  border-color: #d5a91b;
+  background: #f1c93f;
+  color: #30332c;
+}
+
+.modern-stamp-number {
+  color: #30332c;
+}
+
+.modern-stamp-unit {
+  color: #4e5149;
+}
+
+/* 葉の透かしをニュートラルな濃色へ */
+.modern-stamp::before {
+  border-color:
+    rgba(48, 51, 44, 0.11);
+  background:
+    rgba(255, 255, 255, 0.09);
+}
+
+.modern-stamp::after {
+  background:
+    rgba(48, 51, 44, 0.13);
+}
+
+@media (max-width: 360px) {
+  .hero::after {
+    right: -30px;
+    width: 64%;
+  }
+
+  .hero::before {
+    background:
+      linear-gradient(
+        90deg,
+        rgba(255, 240, 166, 1) 0%,
+        rgba(255, 240, 166, 0.96) 39%,
+        rgba(255, 240, 166, 0.68) 59%,
+        rgba(255, 240, 166, 0.12) 86%
+      );
+  }
+}
+
+/* ヘッダー画像をさらに右下へ移動し、不透明度を55%へ変更 */
+.hero::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  top: 16px;
+  right: -62px;
+  bottom: -16px;
+  display: block;
+  width: 60%;
+  background-image:
+    url("/stamp-character.png");
+  background-repeat: no-repeat;
+  background-position: right bottom;
+  background-size: contain;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+/* カード見出し下の短いラインをすべて削除 */
+.card > h2:first-child::after {
+  display: none;
+  content: none;
+}
+
+/* ライン削除後の余白を調整 */
+.card > h2:first-child {
+  padding-bottom: 0;
+}
+
+/* 月桂樹を配置するためスタンプの基準を整理 */
+.modern-stamp {
+  position: relative;
+  isolation: isolate;
+}
+
+/* 左側の月桂樹 */
+.modern-stamp::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  top: 34px;
+  left: 17px;
+  width: 48px;
+  height: 108px;
+  border: 0;
+  border-radius: 0;
+  background:
+    radial-gradient(
+      ellipse at center,
+      rgba(61, 58, 44, 0.17) 0%,
+      rgba(61, 58, 44, 0.17) 48%,
+      transparent 52%
+    )
+    4px 8px / 21px 12px no-repeat,
+
+    radial-gradient(
+      ellipse at center,
+      rgba(61, 58, 44, 0.17) 0%,
+      rgba(61, 58, 44, 0.17) 48%,
+      transparent 52%
+    )
+    14px 26px / 22px 12px no-repeat,
+
+    radial-gradient(
+      ellipse at center,
+      rgba(61, 58, 44, 0.17) 0%,
+      rgba(61, 58, 44, 0.17) 48%,
+      transparent 52%
+    )
+    19px 47px / 22px 12px no-repeat,
+
+    radial-gradient(
+      ellipse at center,
+      rgba(61, 58, 44, 0.17) 0%,
+      rgba(61, 58, 44, 0.17) 48%,
+      transparent 52%
+    )
+    17px 68px / 22px 12px no-repeat,
+
+    radial-gradient(
+      ellipse at center,
+      rgba(61, 58, 44, 0.17) 0%,
+      rgba(61, 58, 44, 0.17) 48%,
+      transparent 52%
+    )
+    9px 87px / 21px 12px no-repeat,
+
+    linear-gradient(
+      72deg,
+      transparent 47%,
+      rgba(61, 58, 44, 0.2) 48%,
+      rgba(61, 58, 44, 0.2) 51%,
+      transparent 52%
+    )
+    center / 100% 100% no-repeat;
+
+  transform: none;
+  transform-origin: center;
+}
+
+/* 右側は左側の月桂樹を左右反転 */
+.modern-stamp::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  top: 34px;
+  right: 17px;
+  left: auto;
+  width: 48px;
+  height: 108px;
+  border: 0;
+  border-radius: 0;
+  background:
+    radial-gradient(
+      ellipse at center,
+      rgba(61, 58, 44, 0.17) 0%,
+      rgba(61, 58, 44, 0.17) 48%,
+      transparent 52%
+    )
+    4px 8px / 21px 12px no-repeat,
+
+    radial-gradient(
+      ellipse at center,
+      rgba(61, 58, 44, 0.17) 0%,
+      rgba(61, 58, 44, 0.17) 48%,
+      transparent 52%
+    )
+    14px 26px / 22px 12px no-repeat,
+
+    radial-gradient(
+      ellipse at center,
+      rgba(61, 58, 44, 0.17) 0%,
+      rgba(61, 58, 44, 0.17) 48%,
+      transparent 52%
+    )
+    19px 47px / 22px 12px no-repeat,
+
+    radial-gradient(
+      ellipse at center,
+      rgba(61, 58, 44, 0.17) 0%,
+      rgba(61, 58, 44, 0.17) 48%,
+      transparent 52%
+    )
+    17px 68px / 22px 12px no-repeat,
+
+    radial-gradient(
+      ellipse at center,
+      rgba(61, 58, 44, 0.17) 0%,
+      rgba(61, 58, 44, 0.17) 48%,
+      transparent 52%
+    )
+    9px 87px / 21px 12px no-repeat,
+
+    linear-gradient(
+      72deg,
+      transparent 47%,
+      rgba(61, 58, 44, 0.2) 48%,
+      rgba(61, 58, 44, 0.2) 51%,
+      transparent 52%
+    )
+    center / 100% 100% no-repeat;
+
+  transform: scaleX(-1);
+  transform-origin: center;
+}
+
+/* 数字と「回」を月桂樹より手前へ表示 */
+.modern-stamp-number,
+.modern-stamp-unit {
+  position: relative;
+  z-index: 2;
+}
+
+@media (max-width: 360px) {
+  .hero::after {
+    top: 18px;
+    right: -58px;
+    bottom: -18px;
+    width: 64%;
+    opacity: 0.55;
+  }
+
+  .modern-stamp::before {
+    top: 30px;
+    left: 13px;
+    width: 44px;
+    height: 100px;
+  }
+
+  .modern-stamp::after {
+    top: 30px;
+    right: 13px;
+    left: auto;
+    width: 44px;
+    height: 100px;
+  }
+}
+
+/* ヘッダー画像：不透明度45%、サイズ50% */
+.hero::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  top: 16px;
+  right: -62px;
+  bottom: -16px;
+  display: block;
+  width: 50%;
+  background-image:
+    url("/stamp-character.png");
+  background-repeat: no-repeat;
+  background-position: right bottom;
+  background-size: contain;
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+/* 自然を感じるスタンプへ全面的に再設計 */
+.modern-stamp {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  width: 180px;
+  height: 180px;
+  margin: 20px auto 4px;
+  overflow: hidden;
+  border: 3px solid #6e8463;
+  border-radius: 50%;
+  background:
+    radial-gradient(
+      circle at 23% 20%,
+      rgba(131, 157, 111, 0.16) 0,
+      rgba(131, 157, 111, 0.16) 19px,
+      transparent 20px
+    ),
+    radial-gradient(
+      circle at 83% 79%,
+      rgba(204, 181, 94, 0.13) 0,
+      rgba(204, 181, 94, 0.13) 25px,
+      transparent 26px
+    ),
+    linear-gradient(
+      145deg,
+      #fffdf3 0%,
+      #edf3e6 58%,
+      #e1ead8 100%
+    );
+  color: #30462f;
+  box-shadow:
+    0 10px 24px rgba(54, 78, 51, 0.16),
+    inset 0 0 0 5px rgba(255, 255, 255, 0.62);
+}
+
+/* 左側の大きな葉 */
+.modern-stamp::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  top: 42px;
+  left: 17px;
+  width: 64px;
+  height: 31px;
+  border: 0;
+  border-radius:
+    100% 0 100% 0;
+  background:
+    rgba(85, 117, 76, 0.17);
+  transform: rotate(-47deg);
+  transform-origin: center;
+  box-shadow: none;
+}
+
+/* 右下の小さな葉 */
+.modern-stamp::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  right: 18px;
+  bottom: 40px;
+  left: auto;
+  width: 48px;
+  height: 23px;
+  border: 0;
+  border-radius:
+    100% 0 100% 0;
+  background:
+    rgba(85, 117, 76, 0.14);
+  transform: rotate(132deg);
+  transform-origin: center;
+  box-shadow: none;
+}
+
+/* 英語装飾を使用しない */
+.modern-stamp-top,
+.modern-stamp-decoration {
+  display: none;
+}
+
+/* 数字を葉より手前へ表示 */
+.modern-stamp-number,
+.modern-stamp-unit {
+  position: relative;
+  z-index: 2;
+}
+
+/* 中央の参加回数 */
+.modern-stamp-number {
+  margin: 0;
+  color: #30462f;
+  font-family:
+    "Arial Black",
+    "Helvetica Neue",
+    sans-serif;
+  font-size: 5.2rem;
+  font-weight: 900;
+  line-height: 0.92;
+  letter-spacing: -0.06em;
+  text-indent: -0.06em;
+  text-shadow:
+    0 2px 0 rgba(255, 255, 255, 0.85);
+}
+
+/* 数字の下の「回」 */
+.modern-stamp-unit {
+  margin-top: 8px;
+  color: #52674e;
+  font-size: 0.98rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-indent: 0.08em;
+}
+
+/* スタンプカードも自然系の色へ調整 */
+.modern-participation-card {
+  border-color: #d3ddca;
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff 0%,
+      #f5f8f0 100%
+    );
+}
+
+.modern-stamp-heading h2 {
+  color: #30462f;
+}
+
+.modern-stamp-eyebrow {
+  color: #708269;
+}
+
+.modern-stamp-description {
+  color: #697568;
+}
+
+@media (max-width: 360px) {
+  .hero::after {
+    top: 18px;
+    right: -58px;
+    bottom: -18px;
+    width: 54%;
+    opacity: 0.45;
+  }
+
+  .modern-stamp {
+    width: 162px;
+    height: 162px;
+  }
+
+  .modern-stamp-number {
+    font-size: 4.65rem;
+  }
+
+  .modern-stamp::before {
+    top: 38px;
+    left: 14px;
+    width: 57px;
+    height: 28px;
+  }
+
+  .modern-stamp::after {
+    right: 15px;
+    bottom: 36px;
+    width: 43px;
+    height: 21px;
+  }
+}
+
+/* 黄色ベースのショップカード風デジタルスタンプ */
+.modern-participation-card {
+  border-color: #e2cd78;
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff 0%,
+      #fff9dc 100%
+    );
+}
+
+.modern-stamp-heading h2 {
+  color: #36342d;
+}
+
+.modern-stamp-eyebrow {
+  color: #987800;
+}
+
+.modern-stamp-description {
+  color: #6a685f;
+}
+
+/* フラットな二重円スタンプ */
+.modern-stamp {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  width: 180px;
+  height: 180px;
+  margin: 20px auto 4px;
+  overflow: hidden;
+  border: 6px solid #d5a514;
+  border-radius: 50%;
+  background: #f2cc46;
+  color: #3f3c2f;
+  box-shadow:
+    0 7px 16px rgba(132, 101, 4, 0.15),
+    inset 0 0 0 4px #fff4ae,
+    inset 0 0 0 8px #d5a514;
+}
+
+/* 内側の破線リング */
+.modern-stamp::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 17px;
+  width: auto;
+  height: auto;
+  border: 2px dashed
+    rgba(83, 72, 28, 0.3);
+  border-radius: 50%;
+  background: transparent;
+  transform: none;
+}
+
+/* 葉を薄い透かしとして中央に配置 */
+.modern-stamp::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  top: 47px;
+  right: auto;
+  bottom: auto;
+  left: 49px;
+  width: 82px;
+  height: 39px;
+  border: 0;
+  border-radius:
+    100% 0 100% 0;
+  background:
+    rgba(255, 255, 255, 0.17);
+  transform: rotate(-35deg);
+  transform-origin: center;
+}
+
+/* 英語装飾は表示しない */
+.modern-stamp-top,
+.modern-stamp-decoration {
+  display: none;
+}
+
+/* 数字と「回」は前面へ表示 */
+.modern-stamp-number,
+.modern-stamp-unit {
+  position: relative;
+  z-index: 2;
+}
+
+/* 参加回数 */
+.modern-stamp-number {
+  margin: 0;
+  color: #3d392b;
+  font-family:
+    "Arial Black",
+    "Helvetica Neue",
+    sans-serif;
+  font-size: 5.15rem;
+  font-weight: 900;
+  line-height: 0.9;
+  letter-spacing: -0.06em;
+  text-indent: -0.06em;
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+/* 「回」を以前より大きく表示 */
+.modern-stamp-unit {
+  margin-top: 10px;
+  color: #4d4836;
+  font-size: 1.28rem;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-indent: 0.08em;
+}
+
+@media (max-width: 360px) {
+  .modern-stamp {
+    width: 162px;
+    height: 162px;
+    border-width: 5px;
+    box-shadow:
+      0 6px 14px rgba(132, 101, 4, 0.14),
+      inset 0 0 0 3px #fff4ae,
+      inset 0 0 0 7px #d5a514;
+  }
+
+  .modern-stamp::before {
+    inset: 15px;
+  }
+
+  .modern-stamp::after {
+    top: 43px;
+    left: 44px;
+    width: 74px;
+    height: 35px;
+  }
+
+  .modern-stamp-number {
+    font-size: 4.65rem;
+  }
+
+  .modern-stamp-unit {
+    margin-top: 8px;
+    font-size: 1.18rem;
+  }
+}
+
+/* お知らせ */
+.notice-card {
+  padding: 18px;
+  border: 1px solid #e1cc72;
+  border-radius: 20px;
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff 0%,
+      #fff8d5 100%
+    );
+  box-shadow:
+    0 8px 24px rgba(107, 91, 20, 0.07);
+}
+
+.notice-heading {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.notice-heading h2 {
+  margin: 1px 0 0;
+  font-size: 1.18rem;
+}
+
+.notice-icon {
+  display: grid;
+  flex: 0 0 34px;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #f1c93f;
+  color: #30332c;
+  font-weight: 900;
+}
+
+.notice-label {
+  margin: 0;
+  color: #856d00;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+}
+
+.notice-content {
+  margin-top: 13px;
+  padding-top: 13px;
+  border-top: 1px solid #eadb9f;
+}
+
+.notice-content h3,
+.notice-content p {
+  margin: 0;
+}
+
+.notice-content p {
+  margin-top: 6px;
+  color: #62665d;
+  font-size: 0.92rem;
+}
+
+.notice-meta {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 12px;
+  color: #77786f;
+  font-size: 0.75rem;
+}
+
+.notice-line-status {
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #edf5e9;
+  color: #496247;
+  font-weight: 700;
+  text-align: right;
+}
+
+/* 参加登録フォーム */
+.check-in-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 112px;
+  padding: 11px 12px;
+  border: 1px solid #ddd4b7;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #30332c;
+  font: inherit;
+  line-height: 1.6;
+}
+
+textarea:focus-visible {
+  outline: 3px solid
+    rgba(128, 95, 16, 0.42);
+  outline-offset: 3px;
+}
+
+.optional-label {
+  display: inline-block;
+  margin-left: 7px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: #eeeade;
+  color: #6c6c64;
+  font-size: 0.68rem;
+  font-weight: 700;
+  vertical-align: middle;
+}
+
+.field-help {
+  margin: 0;
+  color: #777a72;
+  font-size: 0.78rem;
+}
+
+.field-help-between {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.selected-farm {
+  margin-top: 15px;
+  padding: 15px;
+  border: 1px solid #e0ca72;
+  border-radius: 15px;
+  background: #fff8d2;
+}
+
+.selected-farm-label {
+  margin: 0;
+  color: #806a0d;
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+
+.selected-farm h2 {
+  margin: 3px 0 0;
+}
+
+.selected-farm dl {
+  margin: 11px 0 0;
+}
+
+.selected-farm dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 0;
+  border-top: 1px solid #eadb9f;
+}
+
+.selected-farm dt {
+  color: #6b6d65;
+}
+
+.selected-farm dd {
+  margin: 0;
+  font-weight: 800;
+}
+
+.farm-confirmation {
+  margin: 0;
+  padding: 11px 13px;
+  border-left: 4px solid #d8a919;
+  border-radius: 8px;
+  background: #fff8d5;
+  color: #55564f;
+  font-size: 0.88rem;
+}
+
+.photo-preview {
+  padding: 11px;
+  border: 1px solid #e3dcc6;
+  border-radius: 14px;
+  background: #fffdf6;
+}
+
+.photo-preview img {
+  display: block;
+  width: 100%;
+  max-height: 260px;
+  object-fit: contain;
+  border-radius: 10px;
+  background: #f3f1e9;
+}
+
+.photo-remove-button {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 10px;
+  border: 1px solid #d8cec0;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #7e3d35;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.prototype-note {
+  margin: 14px 0 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #f3f1e8;
+  color: #6b6d65;
+  font-size: 0.8rem;
+}
+
+.summary-comment {
+  align-items: flex-start;
+}
+
+.summary-comment strong {
+  max-width: 68%;
+  white-space: pre-wrap;
+}
+
+/* 履歴 */
+.history-list {
+  margin-top: 14px;
+}
+
+.history-item {
+  position: relative;
+}
+
+.history-date {
+  display: block;
+  margin-bottom: 4px;
+  color: #806a0d;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+@media (max-width: 360px) {
+  .notice-meta {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .notice-line-status {
+    align-self: flex-start;
+    text-align: left;
+  }
+
+  .field-help-between {
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .summary-comment {
+    flex-direction: column;
+  }
+
+  .summary-comment strong {
+    max-width: 100%;
+    text-align: left;
+  }
+}
+
+/* カレンダー入力 */
+.date-input-wrapper {
+  position: relative;
+}
+
+.date-input-wrapper input[type="date"] {
+  min-height: 52px;
+  padding:
+    11px 46px 11px 13px;
+  border: 1px solid #ddd4b7;
+  border-radius: 13px;
+  background: #ffffff;
+  color: #30332c;
+  font-size: 1rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.date-input-wrapper input[type="date"]:hover {
+  border-color: #d2bb5b;
+}
+
+.date-input-wrapper input[type="date"]:focus {
+  border-color: #b99416;
+}
+
+.date-input-wrapper
+  input[type="date"]::-webkit-calendar-picker-indicator {
+  position: absolute;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.date-input-icon {
+  position: absolute;
+  top: 50%;
+  right: 13px;
+  display: grid;
+  place-items: center;
+  width: 27px;
+  height: 27px;
+  font-size: 1.15rem;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+/* ラベル相当のテキスト */
+.field-label {
+  margin: 0;
+  color: #464a42;
+  font-size: 0.94rem;
+  font-weight: 750;
+}
+
+/* 作業時間ラジオボタン */
+.time-radio-group {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.time-radio-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 9px 7px;
+  overflow: hidden;
+  border: 2px solid #e3dcc6;
+  border-radius: 13px;
+  background: #ffffff;
+  color: #55574f;
+  font-size: 0.94rem;
+  font-weight: 800;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    border-color 150ms ease,
+    background-color 150ms ease,
+    color 150ms ease,
+    transform 150ms ease;
+}
+
+.time-radio-card:hover {
+  border-color: #d7bd55;
+  background: #fffaf0;
+}
+
+.time-radio-card:active {
+  transform: scale(0.98);
+}
+
+.time-radio-card.is-selected {
+  border-color: #d4a815;
+  background: #f4ce4b;
+  color: #30332c;
+}
+
+.time-radio-card input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.time-radio-card:focus-within {
+  outline: 3px solid
+    rgba(128, 95, 16, 0.42);
+  outline-offset: 3px;
+}
+
+.time-radio-card span {
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 340px) {
+  .time-radio-group {
+    gap: 6px;
+  }
+
+  .time-radio-card {
+    min-height: 50px;
+    padding: 8px 4px;
+    font-size: 0.87rem;
+  }
+}
+
+.save-status {
+  margin: 14px 0 0;
+  padding: 11px 13px;
+  border: 1px solid #cfdcc8;
+  border-radius: 11px;
+  background: #f2f8ef;
+  color: #466047;
+  font-size: 0.88rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.history-comment {
+  margin-top: 9px !important;
+  padding-top: 9px;
+  border-top: 1px solid #e4dfcd;
+  color: #62665d !important;
+  white-space: pre-wrap;
+}
