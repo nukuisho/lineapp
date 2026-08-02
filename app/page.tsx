@@ -24,6 +24,7 @@ export default function HomePage() {
     const savedParticipations =
       getPrototypeParticipations();
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Restore prototype data from browser storage after hydration.
     setTotalVisits(
       mockUser.totalVisits +
         savedParticipations.length,

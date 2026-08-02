@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { ParticipationStamps } from "../../../src/components/participation-stamps";
 import {
   formatJapaneseDate,
@@ -14,7 +14,7 @@ import {
 } from "../../../src/lib/mock-data";
 import { addPrototypeParticipation } from "../../../src/lib/prototype-storage";
 
-export default function CompletePage() {
+function CompletePageContent() {
   const searchParams = useSearchParams();
 
   const [isSaved, setIsSaved] =
@@ -82,6 +82,7 @@ export default function CompletePage() {
           new Date().toISOString(),
       });
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Reflect the completed prototype storage write.
     setIsSaved(true);
 
     if (
@@ -268,5 +269,23 @@ export default function CompletePage() {
         </section>
       </div>
     </main>
+  );
+}
+
+export default function CompletePage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="page-shell">
+          <div className="content">
+            <p role="status">
+              完了画面を読み込んでいます…
+            </p>
+          </div>
+        </main>
+      }
+    >
+      <CompletePageContent />
+    </Suspense>
   );
 }

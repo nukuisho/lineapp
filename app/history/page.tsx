@@ -57,6 +57,7 @@ export default function HistoryPage() {
       },
     );
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Restore prototype data from browser storage after hydration.
     setParticipations(
       combinedParticipations,
     );
