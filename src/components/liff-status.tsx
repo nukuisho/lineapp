@@ -2,6 +2,19 @@
 
 import { useEffect, useState } from "react";
 import { initializeLiff } from "../lib/line/liff";
+import { getLineDisplayName } from "../lib/line/profile";
+
+type LineProfileState =
+  | {
+      status: "not-logged-in";
+    }
+  | {
+      status: "available";
+      displayName: string;
+    }
+  | {
+      status: "unavailable";
+    };
 
 type LiffState =
   | {
@@ -11,6 +24,7 @@ type LiffState =
       status: "ready";
       isInClient: boolean;
       isLoggedIn: boolean;
+      profile: LineProfileState;
     }
   | {
       status: "error";
@@ -26,15 +40,46 @@ export function LiffStatus() {
     let isActive = true;
 
     initializeLiff().then(
-      (liff) => {
+          async (liff) => {
+        const isLoggedIn =
+          liff.isLoggedIn();
+
+        let profile: LineProfileState = {
+          status: "not-logged-in",
+        };
+
+        if (isLoggedIn) {
+          try {
+            const result: unknown =
+              await liff.getProfile();
+
+            const displayName =
+              getLineDisplayName(result);
+
+            profile = displayName
+              ? {
+                  status: "available",
+                  displayName,
+                }
+              : {
+                  status: "unavailable",
+                };
+          } catch {
+            profile = {
+              status: "unavailable",
+            };
+          }
+        }
+
         if (!isActive) {
           return;
         }
 
-setState({
+        setState({
           status: "ready",
           isInClient: liff.isInClient(),
-          isLoggedIn: liff.isLoggedIn(),
+          isLoggedIn,
+          profile,
         });
       },
       () => {
@@ -95,6 +140,36 @@ setState({
           ? "LINEにログイン済みです。"
           : "LINEにログインしていません。"}
       </p>
+      {state.profile.status ===
+        "available" && (
+        <div>
+          <p className="prototype-note">
+            LINEプロフィール（PoC表示）
+          </p>
+
+          <p className="save-status">
+            {state.profile.displayName}さん
+          </p>
+
+          <p className="prototype-note">
+            この表示名は本人確認には
+            使用していません。
+          </p>
+        </div>
+      )}
+
+      {state.profile.status ===
+        "unavailable" && (
+        <p
+          className="prototype-note"
+          role="alert"
+        >
+          LINEプロフィールを
+          表示できませんでした。
+          ページを再読み込みしてください。
+        </p>
+      )}
+
     </div>
   );
 }
