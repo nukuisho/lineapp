@@ -4,7 +4,8 @@
 
 このリポジトリでは、援農ボランティア参加管理LINEアプリの第1段階UI試作品をNext.js + TypeScriptで実装しています。
 
-- LINEおよびFirestoreには未接続です。
+- LINE LIFFとの連携およびLINE IDトークンのサーバー検証を実装しています。
+- Firestoreには未接続です。
 - 画面はすべてダミーデータで表示します。
 - 使用しているダミーデータは、src/lib/mock-data.ts に集約しています。
 
@@ -42,13 +43,16 @@ npm run build
 cp .env.example .env.local
 ```
 
-`.env.local`の`NEXT_PUBLIC_LIFF_ID`へ、LINE Developers Consoleで発行されたLIFF IDを設定する。
+`.env.local`へ、LINE Developers Consoleで発行されたLIFF IDと、LINE LoginチャネルのChannel IDを設定する。
 
 ```env
 NEXT_PUBLIC_LIFF_ID=your-liff-id
+LINE_CHANNEL_ID=your-line-channel-id
 ```
 
-LIFF URL全体ではなく、LIFF IDだけを設定する。`.env.local`はGit管理対象外であり、実際のLIFF IDを`.env.example`へ記載しない。
+LIFF URL全体ではなく、LIFF IDだけを設定する。`NEXT_PUBLIC_LIFF_ID`はブラウザへ公開されるが、`LINE_CHANNEL_ID`はサーバー処理だけで参照するため`NEXT_PUBLIC_`を付けない。
+
+`.env.local`はGit管理対象外であり、実際のLIFF IDやChannel IDを`.env.example`へ記載しない。
 
 依存関係をインストールし、開発サーバーを起動する。
 
@@ -63,9 +67,12 @@ VercelのProduction環境には、次を設定する。
 
 ```env
 NEXT_PUBLIC_LIFF_ID=your-liff-id
+LINE_CHANNEL_ID=your-line-channel-id
 ```
 
-`NEXT_PUBLIC_LIFF_ID`はブラウザ側でLIFF SDKを初期化するための公開可能な識別子である。LINE Channel Secretなどのサーバー用秘密情報には`NEXT_PUBLIC_`を付けない。
+`NEXT_PUBLIC_LIFF_ID`はブラウザ側でLIFF SDKを初期化するための公開可能な識別子である。`LINE_CHANNEL_ID`はLINE IDトークン検証を行うサーバー処理だけで参照し、`NEXT_PUBLIC_`を付けない。
+
+現在使用するLINEのIDトークン検証エンドポイントではChannel Secretを送信しない。LINE Channel Secretなどのサーバー用秘密情報には`NEXT_PUBLIC_`を付けず、ブラウザへ渡さない。
 
 ## 暫定的なビルド・依存関係設定
 
@@ -85,7 +92,7 @@ Next.jsを更新する際は、次を再確認する。
 - データベースには保存しません。
 - 参加記録はUI確認用として、現在のブラウザのlocalStorageだけに保存します。
 - 参加登録はサーバーへ送信せず、ダミーデータとブラウザ内保存を使用する試作品です。
-- 次段階では、LINEログイン状態確認、プロフィール仮表示、IDトークンのサーバー検証、Firestore接続、農園情報取得、履歴保存、重複登録防止を実装します。
+- 次段階では、Firestore接続、農園情報取得、履歴保存、重複登録防止を実装します。
 
 ## LINEプロフィールのPoC表示
 
@@ -93,7 +100,17 @@ Next.jsを更新する際は、次を再確認する。
 
 表示名は実行時に文字列かつ空でないことを検証するが、本人確認、認可、FirestoreのドキュメントID、参加履歴の所有者判定には使用しない。
 
-サーバー側の本人確認は、次段階でLINE IDトークンを検証して行う。LINEユーザーID、IDトークン、アクセストークンは画面へ表示しない。
+サーバー側の本人確認は、LINE IDトークンを検証して行う。LINEユーザーID、IDトークン、アクセストークンは画面へ表示しない。
+
+## LINE IDトークンのサーバー検証
+
+ログイン済みの場合、LIFF SDKの`getIDToken()`でIDトークンを取得し、同一オリジンの`POST /api/line/verify-id-token`へJSONで送信する。
+
+Next.jsのRoute Handlerは、サーバー環境変数`LINE_CHANNEL_ID`とIDトークンを`application/x-www-form-urlencoded`形式でLINE Login v2.1の検証エンドポイントへ送信する。LINEの成功レスポンスも外部データとして実行時検証し、発行元と対象チャネルが一致することを確認する。
+
+IDトークン、検証済みのLINEユーザーID、LINE APIの詳細なエラー、プロフィール情報は、この確認用APIからブラウザへ返さない。IDトークンをログ、URL、localStorageへ保存しない。
+
+この段階では本人確認の成否を画面へ表示するだけであり、Firestoreへのユーザー登録や参加履歴保存はまだ行わない。
 
 ## 2026-08-02 UI試作品の方針変更
 
