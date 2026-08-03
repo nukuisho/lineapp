@@ -5,7 +5,7 @@
 このリポジトリでは、援農ボランティア参加管理LINEアプリの第1段階UI試作品をNext.js + TypeScriptで実装しています。
 
 - LINE LIFFとの連携およびLINE IDトークンのサーバー検証を実装しています。
-- Firestoreには未接続です。
+- Firebase Admin SDKのサーバー側初期化基盤を導入していますが、Firestoreの実データ読み書きはまだ未実装です。
 - 画面はすべてダミーデータで表示します。
 - 使用しているダミーデータは、src/lib/mock-data.ts に集約しています。
 
@@ -25,6 +25,7 @@
 - TypeScript 5.5.4
 - ESLint 9
 - Vitest 4.1.10
+- Firebase Admin SDK 14.2.0
 
 ## 確認コマンド
 
@@ -89,10 +90,10 @@ Next.jsを更新する際は、次を再確認する。
 
 ## 制約
 
-- データベースには保存しません。
+- Firebase Admin SDKの初期化基盤は導入済みですが、Firestoreへの実データ読み書きはまだ行いません。
 - 参加記録はUI確認用として、現在のブラウザのlocalStorageだけに保存します。
 - 参加登録はサーバーへ送信せず、ダミーデータとブラウザ内保存を使用する試作品です。
-- 次段階では、Firestore接続、農園情報取得、履歴保存、重複登録防止を実装します。
+- 次段階では、Firestore接続確認、検証済みLINEユーザーの保存、農園情報取得、履歴保存、重複登録防止を段階的に実装します。
 
 ## LINEプロフィールのPoC表示
 
@@ -134,3 +135,12 @@ IDトークン、検証済みのLINEユーザーID、LINE APIの詳細なエラ�
 写真はプレビューのみで、Firebase Storage等への保存は行わない。
 
 Firestore接続後は、利用中農園の一覧取得、農園のサーバー側検証、コメント保存、重複登録防止を実装する。
+
+
+## Firebase Admin接続基盤
+
+Firebase Admin SDKはNext.jsのサーバー処理だけで使用し、Firebase Authenticationは使用しない。現在は初期化基盤までを実装し、Firestoreの実データ読み書きは後続段階で実装する。
+
+サーバー用環境変数は`FIREBASE_PROJECT_ID`、`FIREBASE_CLIENT_EMAIL`、`FIREBASE_PRIVATE_KEY`とする。これらに`NEXT_PUBLIC_`を付けず、実値をGit管理対象ファイルへ記載しない。
+
+FirebaseプロジェクトはPoCのDevelopment用とProduction用を分離し、どちらもFirestoreロケーション`asia-northeast1`を使用する。ローカル開発とVercel PreviewはDevelopment用、Vercel ProductionはProduction用へ接続する。現段階では両環境ともPoCとする。
