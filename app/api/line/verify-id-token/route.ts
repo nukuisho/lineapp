@@ -1,4 +1,7 @@
 import {
+  saveVerifiedLineUser,
+} from "../../../../src/lib/firebase/line-user";
+import {
   parseVerifiedIdToken,
 } from "../../../../src/lib/line/verified-id-token";
 
@@ -119,6 +122,15 @@ export async function POST(
     verifiedToken.iss !== LINE_TOKEN_ISSUER ||
     verifiedToken.aud !== channelId
   ) {
+    return errorResponse(502);
+  }
+
+  try {
+    await saveVerifiedLineUser(
+      channelId,
+      verifiedToken.sub,
+    );
+  } catch {
     return errorResponse(502);
   }
 
