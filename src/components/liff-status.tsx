@@ -1,8 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { initializeLiff } from "../lib/line/liff";
-import { getLineDisplayName } from "../lib/line/profile";
+import {
+  useEffect,
+  useState,
+} from "react";
+import {
+  verifyLineIdToken,
+} from "../lib/line/id-token-verification";
+import {
+  initializeLiff,
+} from "../lib/line/liff";
+import {
+  getLineDisplayName,
+} from "../lib/line/profile";
 
 type LineProfileState =
   | {
@@ -16,15 +26,30 @@ type LineProfileState =
       status: "unavailable";
     };
 
+type LineVerificationState =
+  | {
+      status: "not-logged-in";
+    }
+  | {
+      status: "verified";
+    }
+  | {
+      status: "unavailable";
+    };
+
 type LiffState =
   | {
       status: "initializing";
+    }
+  | {
+      status: "verifying";
     }
   | {
       status: "ready";
       isInClient: boolean;
       isLoggedIn: boolean;
       profile: LineProfileState;
+      verification: LineVerificationState;
     }
   | {
       status: "error";
@@ -40,13 +65,23 @@ export function LiffStatus() {
     let isActive = true;
 
     initializeLiff().then(
-          async (liff) => {
+      async (liff) => {
         const isLoggedIn =
           liff.isLoggedIn();
+
+        if (isLoggedIn && isActive) {
+          setState({
+            status: "verifying",
+          });
+        }
 
         let profile: LineProfileState = {
           status: "not-logged-in",
         };
+        let verification:
+          LineVerificationState = {
+            status: "not-logged-in",
+          };
 
         if (isLoggedIn) {
           try {
@@ -69,6 +104,29 @@ export function LiffStatus() {
               status: "unavailable",
             };
           }
+
+          try {
+            const idToken =
+              liff.getIDToken();
+
+            const isVerified =
+              typeof idToken === "string" &&
+              await verifyLineIdToken(
+                idToken,
+              );
+
+            verification = isVerified
+              ? {
+                  status: "verified",
+                }
+              : {
+                  status: "unavailable",
+                };
+          } catch {
+            verification = {
+              status: "unavailable",
+            };
+          }
         }
 
         if (!isActive) {
@@ -80,6 +138,7 @@ export function LiffStatus() {
           isInClient: liff.isInClient(),
           isLoggedIn,
           profile,
+          verification,
         });
       },
       () => {
@@ -110,6 +169,18 @@ export function LiffStatus() {
     );
   }
 
+  if (state.status === "verifying") {
+    return (
+      <p
+        className="save-status"
+        role="status"
+        aria-live="polite"
+      >
+        LINEアカウントを確認しています…
+      </p>
+    );
+  }
+
   if (state.status === "error") {
     return (
       <div role="alert">
@@ -135,11 +206,55 @@ export function LiffStatus() {
         LINE連携の準備ができました。
       </p>
 
-<p className="prototype-note">
+      <p className="prototype-note">
+        {state.isInClient
+          ? "LINEアプリ内で開いています。"
+          : "LINEアプリ外で開いています。"}
+      </p>
+
+      <p className="prototype-note">
         {state.isLoggedIn
           ? "LINEにログイン済みです。"
           : "LINEにログインしていません。"}
       </p>
+
+      <div>
+        <p className="prototype-note">
+          LINE本人確認
+        </p>
+
+        {state.verification.status ===
+          "verified" && (
+          <p className="save-status">
+            サーバーで本人確認できました。
+          </p>
+        )}
+
+        {state.verification.status ===
+          "not-logged-in" && (
+          <p className="prototype-note">
+            LINEへログインすると
+            本人確認を行います。
+          </p>
+        )}
+
+        {state.verification.status ===
+          "unavailable" && (
+          <div role="alert">
+            <p className="save-status">
+              LINEアカウントを
+              確認できませんでした。
+            </p>
+
+            <p className="prototype-note">
+              ページを再読み込みしてください。
+              解決しない場合は、時間をおいて
+              もう一度お試しください。
+            </p>
+          </div>
+        )}
+      </div>
+
       {state.profile.status ===
         "available" && (
         <div>
@@ -169,7 +284,6 @@ export function LiffStatus() {
           ページを再読み込みしてください。
         </p>
       )}
-
     </div>
   );
 }
