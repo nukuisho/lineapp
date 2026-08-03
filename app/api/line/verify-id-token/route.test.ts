@@ -7,8 +7,18 @@ import {
   vi,
 } from "vitest";
 import {
+  saveVerifiedLineUser,
+} from "../../../../src/lib/firebase/line-user";
+import {
   POST,
 } from "./route";
+
+vi.mock(
+  "../../../../src/lib/firebase/line-user",
+  () => ({
+    saveVerifiedLineUser: vi.fn(),
+  }),
+);
 
 const endpoint =
   "https://api.line.me/oauth2/v2.1/verify";
@@ -50,6 +60,9 @@ describe("POST /api/line/verify-id-token", () => {
   beforeEach(() => {
     vi.stubEnv("LINE_CHANNEL_ID", channelId);
     vi.stubGlobal("fetch", fetchMock);
+    vi.mocked(
+      saveVerifiedLineUser,
+    ).mockResolvedValue("created");
   });
 
   afterEach(() => {
@@ -108,6 +121,12 @@ describe("POST /api/line/verify-id-token", () => {
     );
     expect(requestBody.get("client_id")).toBe(
       channelId,
+    );
+    expect(
+      saveVerifiedLineUser,
+    ).toHaveBeenCalledWith(
+      channelId,
+      verifiedResponse.sub,
     );
   });
 
@@ -253,6 +272,56 @@ describe("POST /api/line/verify-id-token", () => {
       );
 
       expect(response.status).toBe(502);
+    },
+  );
+
+
+  it(
+    "既存ユーザーの再利用でも成功レスポンスを変えない",
+    async () => {
+      fetchMock.mockResolvedValue(
+        Response.json(verifiedResponse),
+      );
+      vi.mocked(
+        saveVerifiedLineUser,
+      ).mockResolvedValue("reused");
+
+      const response = await POST(
+        createJsonRequest({ idToken }),
+      );
+
+      expect(response.status).toBe(200);
+      await expect(response.json()).resolves.toEqual({
+        verified: true,
+      });
+    },
+  );
+
+  it(
+    "Firestore保存失敗を汎用エラーへ変換する",
+    async () => {
+      fetchMock.mockResolvedValue(
+        Response.json(verifiedResponse),
+      );
+      vi.mocked(
+        saveVerifiedLineUser,
+      ).mockRejectedValue(
+        new Error("users/internal-id secret-sub"),
+      );
+
+      const response = await POST(
+        createJsonRequest({ idToken }),
+      );
+      const responseText = await response.text();
+
+      expect(response.status).toBe(502);
+      expect(responseText).not.toContain(
+        "users/internal-id",
+      );
+      expect(responseText).not.toContain("secret-sub");
+      expect(responseText).not.toContain(
+        verifiedResponse.sub,
+      );
     },
   );
 });

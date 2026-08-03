@@ -709,31 +709,28 @@ MVPでは、追加のUIコンポーネントライブラリを必須としない
 
 想定項目：
 
-```text
+\`\`\`text
 id
-lineUserId
-displayName
-pictureUrl
-totalVisits
+totalParticipations
 totalStamps
-status
 createdAt
 updatedAt
-```
+lastAuthenticatedAt
+\`\`\`
 
-### status候補
+### 内部ユーザーID
 
-```text
-ACTIVE
-SUSPENDED
-```
+Next.jsサーバー側で、\`LINE_CHANNEL_ID + ":" + 検証済みsub\`のSHA-256ハッシュを生成し、決定的な内部ユーザーIDとして使用する。
+
+検証済み\`sub\`、LINE Channel ID、IDトークンはFirestoreへ保存せず、ブラウザへ返さない。
 
 ### 制約
 
-* `lineUserId`は一意
-* `totalVisits`は0以上
-* `totalStamps`は0以上
-* `SUSPENDED`のユーザーは参加登録不可
+* 新規ユーザーでは\`totalParticipations\`と\`totalStamps\`を0で初期化する
+* 既存ユーザーの再認証では集計値と\`createdAt\`を変更しない
+* 新規作成と既存再利用はFirestore Transactionで処理する
+* LINE表示名とプロフィール画像URLを本人確認、認可、ドキュメントIDへ使用しない
+* クライアントから送信されたユーザーIDを信用しない
 
 ---
 
