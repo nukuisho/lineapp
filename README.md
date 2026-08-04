@@ -144,3 +144,12 @@ Firebase Admin SDKはNext.jsのサーバー処理だけで使用し、Firebase A
 サーバー用環境変数は`FIREBASE_PROJECT_ID`、`FIREBASE_CLIENT_EMAIL`、`FIREBASE_PRIVATE_KEY`とする。これらに`NEXT_PUBLIC_`を付けず、実値をGit管理対象ファイルへ記載しない。
 
 FirebaseプロジェクトはPoCのDevelopment用とProduction用を分離し、どちらもFirestoreロケーション`asia-northeast1`を使用する。ローカル開発とVercel PreviewはDevelopment用、Vercel ProductionはProduction用へ接続する。現段階では両環境ともPoCとする。
+
+
+## 利用可能農園一覧API
+
+\`GET /api/farms\`は、Firebase Admin SDKを使用してFirestoreの\`farms\`コレクションをサーバー側で読み取る。
+
+一覧には\`isActive\`と\`isAccepting\`がともにtrueの農園だけを含め、ブラウザへは\`id\`、\`name\`、\`ownerName\`、\`fruitTypes\`だけを返す。状態値、Timestamp、Firebase内部エラーは返さない。
+
+現在の参加登録画面は引き続きダミー農園を使用する。Firestore農園一覧へのUI切り替えと、参加登録時の\`farmId\`再検証は後続段階で実装する。

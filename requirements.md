@@ -738,30 +738,28 @@ Next.jsサーバー側で、\`LINE_CHANNEL_ID + ":" + 検証済みsub\`のSHA-25
 
 想定項目：
 
-```text
+\`\`\`text
 id
 name
 ownerName
-qrToken
+fruitTypes
 isActive
+isAccepting
 createdAt
 updatedAt
-```
-
-任意項目：
-
-```text
-fruitTypes
-description
-```
+\`\`\`
 
 ### 制約
 
-* `qrToken`は一意
-* `qrToken`は推測困難なランダム値
-* `isActive`がfalseの場合は参加登録不可
-* 住所はMVPでは必須としない
-* 農家の電話番号などは保存しない
+* 農園ドキュメントIDにはFirestoreの自動IDを使用する
+* 農園一覧には\`isActive\`と\`isAccepting\`がともにtrueの農園だけを含める
+* 一覧取得後も各農園ドキュメントをサーバー側で実行時検証する
+* 参加登録時には選択された\`farmId\`の存在と状態を再検証する
+* クライアントから送信された農園名、農家名、作物、状態値を信用しない
+* \`fruitTypes\`は1件以上の空でない文字列配列とする
+* \`createdAt\`と\`updatedAt\`はFirestore Timestampとする
+* 通常の停止では物理削除せず、\`isActive\`または\`isAccepting\`を変更する
+* 住所と農家の電話番号はMVPでは保存しない
 
 ---
 
