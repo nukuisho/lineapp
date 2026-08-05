@@ -771,18 +771,23 @@ updatedAt
 id
 userId
 farmId
+farmName
+farmOwnerName
+farmFruitTypes
 workDate
 workType
 timeCategory
 stampsGranted
+status
 createdAt
+updatedAt
 ```
 
 任意項目：
 
 ```text
+comment
 otherWorkDescription
-status
 ```
 
 ### 制約
