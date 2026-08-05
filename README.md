@@ -152,4 +152,4 @@ FirebaseプロジェクトはPoCのDevelopment用とProduction用を分離し、
 
 一覧には\`isActive\`と\`isAccepting\`がともにtrueの農園だけを含め、ブラウザへは\`id\`、\`name\`、\`ownerName\`、\`fruitTypes\`だけを返す。状態値、Timestamp、Firebase内部エラーは返さない。
 
-現在の参加登録画面は引き続きダミー農園を使用する。Firestore農園一覧へのUI切り替えと、参加登録時の\`farmId\`再検証は後続段階で実装する。
+現在の参加登録画面は引き続きダミー農園を使用する。参加登録Transactionのサーバー側基盤、Firestore農園一覧へのUI切り替え、参加登録APIへの接続は後続段階で実装する。
