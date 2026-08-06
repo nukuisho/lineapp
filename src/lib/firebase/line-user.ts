@@ -9,9 +9,10 @@ import {
   createInternalUserId,
 } from "../line/internal-user-id";
 
-export type SaveVerifiedLineUserResult =
-  | "created"
-  | "reused";
+export type SaveVerifiedLineUserResult = {
+  status: "created" | "reused";
+  userId: string;
+};
 
 export async function saveVerifiedLineUser(
   channelId: string,
@@ -45,7 +46,10 @@ export async function saveVerifiedLineUser(
           },
         );
 
-        return "reused";
+        return {
+          status: "reused",
+          userId,
+        };
       }
 
       transaction.create(
@@ -60,7 +64,10 @@ export async function saveVerifiedLineUser(
         },
       );
 
-      return "created";
+      return {
+        status: "created",
+        userId,
+      };
     },
   );
 }

@@ -69,7 +69,11 @@ describe("saveVerifiedLineUser", () => {
           "1234567890",
           "U1234567890",
         ),
-      ).resolves.toBe("created");
+      ).resolves.toEqual({
+        status: "created",
+        userId:
+          "ec26ab42c83fb4f07a31c3eea056d7da398aeebdff4d6f71aad08c1dc1323e1a",
+      });
 
       expect(collection).toHaveBeenCalledWith(
         "users",
@@ -115,7 +119,11 @@ describe("saveVerifiedLineUser", () => {
           "1234567890",
           "U1234567890",
         ),
-      ).resolves.toBe("reused");
+      ).resolves.toEqual({
+        status: "reused",
+        userId:
+          "ec26ab42c83fb4f07a31c3eea056d7da398aeebdff4d6f71aad08c1dc1323e1a",
+      });
 
       expect(update).toHaveBeenCalledOnce();
       expect(create).not.toHaveBeenCalled();

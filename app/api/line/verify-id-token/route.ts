@@ -2,13 +2,9 @@ import {
   saveVerifiedLineUser,
 } from "../../../../src/lib/firebase/line-user";
 import {
-  parseVerifiedIdToken,
-} from "../../../../src/lib/line/verified-id-token";
-
-const LINE_VERIFY_ENDPOINT =
-  "https://api.line.me/oauth2/v2.1/verify";
-const LINE_TOKEN_ISSUER =
-  "https://access.line.me";
+  LineIdTokenVerificationError,
+  verifyLineIdTokenOnServer,
+} from "../../../../src/lib/line/server-id-token-verification";
 
 type VerifyIdTokenRequest = {
   idToken: string;
@@ -31,13 +27,6 @@ function parseRequestBody(
   return {
     idToken: value.idToken,
   };
-}
-
-function getLineChannelId(): string | null {
-  const channelId =
-    process.env.LINE_CHANNEL_ID?.trim();
-
-  return channelId || null;
 }
 
 function errorResponse(
@@ -72,65 +61,30 @@ export async function POST(
     return errorResponse(400);
   }
 
-  const channelId = getLineChannelId();
-
-  if (!channelId) {
-    return errorResponse(500);
-  }
-
-  const body = new URLSearchParams({
-    id_token: input.idToken,
-    client_id: channelId,
-  });
-
-  let lineResponse: Response;
-
   try {
-    lineResponse = await fetch(
-      LINE_VERIFY_ENDPOINT,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type":
-            "application/x-www-form-urlencoded",
-        },
-        body,
-        cache: "no-store",
-      },
-    );
-  } catch {
-    return errorResponse(502);
-  }
+    const identity =
+      await verifyLineIdTokenOnServer(
+        input.idToken,
+      );
 
-  if (!lineResponse.ok) {
-    return errorResponse(401);
-  }
-
-  let responseBody: unknown;
-
-  try {
-    responseBody = await lineResponse.json();
-  } catch {
-    return errorResponse(502);
-  }
-
-  const verifiedToken =
-    parseVerifiedIdToken(responseBody);
-
-  if (
-    !verifiedToken ||
-    verifiedToken.iss !== LINE_TOKEN_ISSUER ||
-    verifiedToken.aud !== channelId
-  ) {
-    return errorResponse(502);
-  }
-
-  try {
     await saveVerifiedLineUser(
-      channelId,
-      verifiedToken.sub,
+      identity.channelId,
+      identity.token.sub,
     );
-  } catch {
+  } catch (error) {
+    if (
+      error instanceof
+      LineIdTokenVerificationError
+    ) {
+      if (error.code === "configuration") {
+        return errorResponse(500);
+      }
+
+      if (error.code === "invalid-token") {
+        return errorResponse(401);
+      }
+    }
+
     return errorResponse(502);
   }
 

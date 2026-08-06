@@ -152,4 +152,10 @@ FirebaseプロジェクトはPoCのDevelopment用とProduction用を分離し、
 
 一覧には\`isActive\`と\`isAccepting\`がともにtrueの農園だけを含め、ブラウザへは\`id\`、\`name\`、\`ownerName\`、\`fruitTypes\`だけを返す。状態値、Timestamp、Firebase内部エラーは返さない。
 
-現在の参加登録画面は引き続きダミー農園を使用する。参加登録Transactionのサーバー側基盤、Firestore農園一覧へのUI切り替え、参加登録APIへの接続は後続段階で実装する。
+現在の参加登録画面は引き続きダミー農園を使用する。Firestore農園一覧へのUI切り替えと参加登録APIへの画面接続は後続段階で実装する。
+
+## 参加登録API
+
+`POST /api/participations`は、ブラウザから受け取ったLINE IDトークンをLINE APIで再検証し、検証結果から生成した内部ユーザーIDを使用して参加を登録する。クライアントからユーザーID、作業日、農園表示情報、付与スタンプ数は受け取らない。
+
+参加登録時はFirestoreから農園の存在と受付状態を再確認し、参加履歴、同日重複防止キー、ユーザー集計値をTransactionで一体更新する。重複登録はHTTP 409で返し、LINE IDトークン、LINEユーザーID、内部ユーザーID、Firebase内部エラーはブラウザへ返さない。

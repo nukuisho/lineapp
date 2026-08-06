@@ -16,6 +16,24 @@ import {
 const maximumCommentLength = 500;
 const stampsGranted = 1;
 
+export type ParticipationRegistrationErrorCode =
+  | "invalid-input"
+  | "user-not-found"
+  | "farm-unavailable"
+  | "duplicate";
+
+export class ParticipationRegistrationError
+  extends Error {
+  constructor(
+    readonly code:
+      ParticipationRegistrationErrorCode,
+    message: string,
+  ) {
+    super(message);
+    this.name = "ParticipationRegistrationError";
+  }
+}
+
 export type RegisterParticipationInput = {
   userId: string;
   farmId: string;
@@ -110,7 +128,8 @@ export async function registerParticipation(
     (comment?.length ?? 0) >
       maximumCommentLength
   ) {
-    throw new Error(
+    throw new ParticipationRegistrationError(
+      "invalid-input",
       "参加登録の入力を確認できませんでした。",
     );
   }
@@ -153,7 +172,8 @@ export async function registerParticipation(
         );
 
       if (!userSnapshot.exists) {
-        throw new Error(
+        throw new ParticipationRegistrationError(
+          "user-not-found",
           "参加登録のユーザーを確認できませんでした。",
         );
       }
@@ -164,13 +184,15 @@ export async function registerParticipation(
       );
 
       if (!farm) {
-        throw new Error(
+        throw new ParticipationRegistrationError(
+          "farm-unavailable",
           "参加登録の農園を確認できませんでした。",
         );
       }
 
       if (duplicateKeySnapshot.exists) {
-        throw new Error(
+        throw new ParticipationRegistrationError(
+          "duplicate",
           "本日のこの農園への参加は、すでに記録されています。",
         );
       }
