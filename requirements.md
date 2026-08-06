@@ -482,6 +482,8 @@ FULL_DAY: 終日
 
 参加履歴作成と集計値更新は、可能な限りFirestore Transactionで処理する。
 
+参加登録APIは`POST /api/participations`とする。クライアントはLINE IDトークン、`farmId`、作業内容、作業時間区分、任意コメントだけを送信する。ユーザーID、作業日、農園表示情報、付与スタンプ数はサーバー側で確定する。
+
 ### 登録成功時
 
 次を返す。

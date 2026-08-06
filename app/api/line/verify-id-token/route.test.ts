@@ -62,7 +62,10 @@ describe("POST /api/line/verify-id-token", () => {
     vi.stubGlobal("fetch", fetchMock);
     vi.mocked(
       saveVerifiedLineUser,
-    ).mockResolvedValue("created");
+    ).mockResolvedValue({
+      status: "created",
+      userId: "internal-user-id",
+    });
   });
 
   afterEach(() => {
@@ -284,7 +287,10 @@ describe("POST /api/line/verify-id-token", () => {
       );
       vi.mocked(
         saveVerifiedLineUser,
-      ).mockResolvedValue("reused");
+      ).mockResolvedValue({
+        status: "reused",
+        userId: "internal-user-id",
+      });
 
       const response = await POST(
         createJsonRequest({ idToken }),
