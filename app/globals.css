@@ -1799,9 +1799,16 @@ textarea:focus-visible {
 /* カレンダー入力 */
 .date-input-wrapper {
   position: relative;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .date-input-wrapper input[type="date"] {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   min-height: 52px;
   padding:
     11px 46px 11px 13px;

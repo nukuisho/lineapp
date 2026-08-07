@@ -2,6 +2,9 @@ import {
   FieldValue,
 } from "firebase-admin/firestore";
 import {
+  getValidatedWorkDate,
+} from "../participation-work-date";
+import {
   getValidatedTimeCategory,
   getValidatedWorkType,
 } from "../validation";
@@ -37,6 +40,7 @@ export class ParticipationRegistrationError
 export type RegisterParticipationInput = {
   userId: string;
   farmId: string;
+  workDate: string;
   workType: string;
   timeCategory: string;
   comment?: string;
@@ -59,39 +63,6 @@ function normalizeRequiredString(
   const normalizedValue = value.trim();
 
   return normalizedValue || null;
-}
-
-function getWorkDateInJapan(
-  currentDate: Date,
-): string {
-  const parts =
-    new Intl.DateTimeFormat(
-      "en-CA",
-      {
-        timeZone: "Asia/Tokyo",
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-      },
-    ).formatToParts(currentDate);
-
-  const year = parts.find(
-    (part) => part.type === "year",
-  )?.value;
-  const month = parts.find(
-    (part) => part.type === "month",
-  )?.value;
-  const day = parts.find(
-    (part) => part.type === "day",
-  )?.value;
-
-  if (!year || !month || !day) {
-    throw new Error(
-      "作業日を確定できませんでした。",
-    );
-  }
-
-  return `${year}-${month}-${day}`;
 }
 
 function createDuplicateKey(
@@ -118,11 +89,17 @@ export async function registerParticipation(
     getValidatedTimeCategory(
       input.timeCategory,
     );
+  const workDate =
+    getValidatedWorkDate(
+      input.workDate,
+      input.currentDate ?? new Date(),
+    );
   const comment = input.comment?.trim();
 
   if (
     !userId ||
     !farmId ||
+    !workDate ||
     !workType ||
     !timeCategory ||
     (comment?.length ?? 0) >
@@ -134,9 +111,6 @@ export async function registerParticipation(
     );
   }
 
-  const workDate = getWorkDateInJapan(
-    input.currentDate ?? new Date(),
-  );
   const duplicateKey = createDuplicateKey(
     userId,
     farmId,
@@ -193,7 +167,7 @@ export async function registerParticipation(
       if (duplicateKeySnapshot.exists) {
         throw new ParticipationRegistrationError(
           "duplicate",
-          "本日のこの農園への参加は、すでに記録されています。",
+          "この作業日のこの農園への参加は、すでに記録されています。",
         );
       }
 

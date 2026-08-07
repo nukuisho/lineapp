@@ -79,6 +79,7 @@ function validRequestBody() {
   return {
     idToken,
     farmId: "farm-001",
+    workDate: "2026-08-06",
     workType: "袋掛け",
     timeCategory: "午前",
     comment: "よろしくお願いします。",
@@ -168,6 +169,7 @@ describe("POST /api/participations", () => {
       ).toHaveBeenCalledWith({
         userId: "internal-user-id",
         farmId: "farm-001",
+        workDate: "2026-08-06",
         workType: "袋掛け",
         timeCategory: "午前",
         comment: "よろしくお願いします。",
@@ -186,6 +188,14 @@ describe("POST /api/participations", () => {
     {
       ...validRequestBody(),
       farmId: 123,
+    },
+    {
+      ...validRequestBody(),
+      workDate: 123,
+    },
+    {
+      ...validRequestBody(),
+      workDate: "",
     },
     {
       ...validRequestBody(),
@@ -272,7 +282,7 @@ describe("POST /api/participations", () => {
       expect(response.status).toBe(409);
 
       expect(responseText).toContain(
-        "本日のこの農園への参加は、すでに記録されています。",
+        "この作業日のこの農園への参加は、すでに記録されています。",
       );
 
       expect(responseText).not.toContain(

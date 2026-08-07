@@ -9,7 +9,6 @@ import {
   useState,
 } from "react";
 import {
-  getTodayInJapan,
   timeCategoryOptions,
   workTypeOptions,
 } from "../../src/lib/mock-data";
@@ -25,9 +24,14 @@ import {
   parseParticipationResponse,
   saveCompletedParticipation,
 } from "../../src/lib/participation-response";
+import {
+  getParticipationWorkDateRange,
+  getValidatedWorkDate,
+} from "../../src/lib/participation-work-date";
 
 type FormErrors = {
   farmId?: string;
+  workDate?: string;
   workType?: string;
   timeCategory?: string;
   comment?: string;
@@ -51,8 +55,13 @@ export default function CheckInPage() {
   const [farmListStatus, setFarmListStatus] =
     useState<FarmListStatus>("loading");
 
-  const workDate =
-    getTodayInJapan();
+  const workDateRange =
+    getParticipationWorkDateRange();
+
+  const [workDate, setWorkDate] =
+    useState(
+      workDateRange.maximum,
+    );
 
   const [farmId, setFarmId] =
     useState("");
@@ -154,6 +163,11 @@ export default function CheckInPage() {
     if (!selectedFarm) {
       nextErrors.farmId =
         "農園を選択してください。";
+    }
+
+    if (!getValidatedWorkDate(workDate)) {
+      nextErrors.workDate =
+        "作業日は本日から1か月前までの範囲で選択してください。";
     }
 
     if (!workType) {
@@ -313,6 +327,7 @@ export default function CheckInPage() {
           body: JSON.stringify({
             idToken,
             farmId,
+            workDate,
             workType,
             timeCategory,
             ...(comment.trim()
@@ -525,18 +540,63 @@ export default function CheckInPage() {
             )}
 
             <div className="field-row">
-              <p className="field-label">
+              <label htmlFor="workDate">
                 作業日
+              </label>
+
+              <div className="date-input-wrapper">
+                <input
+                  id="workDate"
+                  name="workDate"
+                  type="date"
+                  value={workDate}
+                  min={workDateRange.minimum}
+                  max={workDateRange.maximum}
+                  aria-describedby={
+                    errors.workDate
+                      ? "workDate-help workDate-error"
+                      : "workDate-help"
+                  }
+                  aria-invalid={
+                    Boolean(errors.workDate)
+                  }
+                  onChange={(event) => {
+                    setWorkDate(
+                      event.target.value,
+                    );
+
+                    setErrors((current) => ({
+                      ...current,
+                      workDate: undefined,
+                    }));
+                  }}
+                />
+
+                <span
+                  className="date-input-icon"
+                  aria-hidden="true"
+                >
+                  📅
+                </span>
+              </div>
+
+              <p
+                id="workDate-help"
+                className="field-help"
+              >
+                日本時間の本日から
+                1か月前まで選択できます。
               </p>
 
-              <p className="work-date-display">
-                <strong>{workDate}</strong>
-              </p>
-
-              <p className="field-help">
-                作業日は登録時にサーバーが
-                日本時間で確定します。
-              </p>
+              {errors.workDate && (
+                <p
+                  id="workDate-error"
+                  className="error-text"
+                  role="alert"
+                >
+                  {errors.workDate}
+                </p>
+              )}
             </div>
 
             <div className="field-row">

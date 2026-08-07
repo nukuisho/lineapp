@@ -24,6 +24,11 @@ const firestoreTimestamp =
 
 const userId = "user-001";
 const farmId = "farm-001";
+const workDate = "2026-08-05";
+const currentDate =
+  new Date(
+    "2026-08-07T03:00:00.000Z",
+  );
 const duplicateKey =
   "user-001_farm-001_2026-08-05";
 
@@ -173,6 +178,7 @@ describe("registerParticipation", () => {
         registerParticipation({
           userId,
           farmId,
+          workDate,
           workType: "袋掛け",
           timeCategory: "午前",
           comment: "  よろしくお願いします。  ",
@@ -257,6 +263,7 @@ describe("registerParticipation", () => {
         registerParticipation({
           userId,
           farmId,
+          workDate,
           workType: "袋掛け",
           timeCategory: "午前",
           currentDate: new Date(
@@ -264,7 +271,7 @@ describe("registerParticipation", () => {
           ),
         }),
       ).rejects.toThrow(
-        "本日のこの農園への参加は、すでに記録されています。",
+        "この作業日のこの農園への参加は、すでに記録されています。",
       );
 
       expect(create).not.toHaveBeenCalled();
@@ -284,6 +291,7 @@ describe("registerParticipation", () => {
         registerParticipation({
           userId,
           farmId,
+          workDate,
           workType: "袋掛け",
           timeCategory: "午前",
           currentDate: new Date(
@@ -300,12 +308,64 @@ describe("registerParticipation", () => {
   );
 
   it(
+    "登録可能期間より前の日付ではTransactionを開始しない",
+    async () => {
+      await expect(
+        registerParticipation({
+          userId,
+          farmId,
+          workDate: "2026-07-06",
+          currentDate,
+          workType: "袋掛け",
+          timeCategory: "午前",
+        }),
+      ).rejects.toThrow(
+        "参加登録の入力を確認できませんでした。",
+      );
+
+      expect(
+        runTransaction,
+      ).not.toHaveBeenCalled();
+      expect(get).not.toHaveBeenCalled();
+      expect(create).not.toHaveBeenCalled();
+      expect(update).not.toHaveBeenCalled();
+    },
+  );
+
+  it(
+    "未来日ではTransactionを開始しない",
+    async () => {
+      await expect(
+        registerParticipation({
+          userId,
+          farmId,
+          workDate: "2026-08-08",
+          currentDate,
+          workType: "袋掛け",
+          timeCategory: "午前",
+        }),
+      ).rejects.toThrow(
+        "参加登録の入力を確認できませんでした。",
+      );
+
+      expect(
+        runTransaction,
+      ).not.toHaveBeenCalled();
+      expect(get).not.toHaveBeenCalled();
+      expect(create).not.toHaveBeenCalled();
+      expect(update).not.toHaveBeenCalled();
+    },
+  );
+
+  it(
     "不正な作業内容ではFirestore Transactionを開始しない",
     async () => {
       await expect(
         registerParticipation({
           userId,
           farmId,
+          workDate,
+          currentDate,
           workType: "不正な作業",
           timeCategory: "午前",
         }),
@@ -327,6 +387,8 @@ describe("registerParticipation", () => {
         registerParticipation({
           userId,
           farmId,
+          workDate,
+          currentDate,
           workType: "袋掛け",
           timeCategory: "午前",
           comment: "あ".repeat(501),
