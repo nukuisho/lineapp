@@ -6,40 +6,53 @@ import {
   ChangeEvent,
   FormEvent,
   useEffect,
-  useMemo,
   useState,
 } from "react";
 import {
-  getActiveFarms,
-  getFarmById,
   getTodayInJapan,
   timeCategoryOptions,
   workTypeOptions,
 } from "../../src/lib/mock-data";
+import {
+  parseAvailableFarmsResponse,
+  type AvailableFarm,
+} from "../../src/lib/available-farms-response";
+import {
+  initializeLiff,
+} from "../../src/lib/line/liff";
+import {
+  getParticipationErrorMessage,
+  parseParticipationResponse,
+  saveCompletedParticipation,
+} from "../../src/lib/participation-response";
 
 type FormErrors = {
   farmId?: string;
-  workDate?: string;
   workType?: string;
   timeCategory?: string;
   comment?: string;
   photo?: string;
 };
 
-const mockDelayMilliseconds = 700;
 const maximumCommentLength = 500;
 const maximumPhotoBytes = 5 * 1024 * 1024;
+
+type FarmListStatus =
+  | "loading"
+  | "ready"
+  | "error";
 
 export default function CheckInPage() {
   const router = useRouter();
 
-  const activeFarms = useMemo(
-    () => getActiveFarms(),
-    [],
-  );
+  const [activeFarms, setActiveFarms] =
+    useState<AvailableFarm[]>([]);
 
-  const [workDate, setWorkDate] =
-    useState(() => getTodayInJapan());
+  const [farmListStatus, setFarmListStatus] =
+    useState<FarmListStatus>("loading");
+
+  const workDate =
+    getTodayInJapan();
 
   const [farmId, setFarmId] =
     useState("");
@@ -64,11 +77,66 @@ export default function CheckInPage() {
   const [errors, setErrors] =
     useState<FormErrors>({});
 
+  const [submitError, setSubmitError] =
+    useState("");
+
   const [isSubmitting, setIsSubmitting] =
     useState(false);
 
   const selectedFarm =
-    getFarmById(farmId);
+    activeFarms.find(
+      (farm) => farm.id === farmId,
+    ) ?? null;
+
+  useEffect(() => {
+    const controller =
+      new AbortController();
+
+    async function loadAvailableFarms() {
+      try {
+        const response = await fetch(
+          "/api/farms",
+          {
+            cache: "no-store",
+            signal: controller.signal,
+          },
+        );
+
+        const responseBody: unknown =
+          await response.json();
+
+        const farms =
+          response.ok
+            ? parseAvailableFarmsResponse(
+                responseBody,
+              )
+            : null;
+
+        if (!farms) {
+          setFarmListStatus("error");
+          return;
+        }
+
+        setActiveFarms(farms);
+        setFarmListStatus("ready");
+      } catch (error) {
+        if (
+          error instanceof DOMException &&
+          error.name === "AbortError"
+        ) {
+          return;
+        }
+
+        setFarmListStatus("error");
+      }
+    }
+
+    void loadAvailableFarms();
+
+    return () => {
+      controller.abort();
+    };
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -83,14 +151,9 @@ export default function CheckInPage() {
   function validate(): FormErrors {
     const nextErrors: FormErrors = {};
 
-    if (!getFarmById(farmId)) {
+    if (!selectedFarm) {
       nextErrors.farmId =
         "農園を選択してください。";
-    }
-
-    if (!workDate) {
-      nextErrors.workDate =
-        "作業日を選択してください。";
     }
 
     if (!workType) {
@@ -174,7 +237,7 @@ export default function CheckInPage() {
     }));
   }
 
-  function handleSubmit(
+  async function handleSubmit(
     event: FormEvent<HTMLFormElement>,
   ) {
     event.preventDefault();
@@ -185,9 +248,11 @@ export default function CheckInPage() {
 
     const nextErrors = validate();
     setErrors(nextErrors);
+    setSubmitError("");
 
     if (
-      Object.keys(nextErrors).length > 0
+      Object.keys(nextErrors).length > 0 ||
+      !selectedFarm
     ) {
       return;
     }
@@ -195,7 +260,7 @@ export default function CheckInPage() {
     const confirmationMessage = [
       "以下の内容で参加を記録します。",
       "",
-      `農園：${selectedFarm?.name ?? "未選択"}`,
+      `農園：${selectedFarm.name}`,
       `作業日：${workDate}`,
       `作業内容：${workType}`,
       `作業時間：${timeCategory}`,
@@ -215,32 +280,92 @@ export default function CheckInPage() {
 
     setIsSubmitting(true);
 
-    const registrationId =
-      typeof crypto.randomUUID === "function"
-        ? crypto.randomUUID()
-        : `${Date.now()}-${Math.random()}`;
+    try {
+      const liff = await initializeLiff();
 
-    const parameters =
-      new URLSearchParams({
-        registrationId,
-        farmId,
-        workDate,
-        workType,
-        timeCategory,
-      });
+      if (!liff.isLoggedIn()) {
+        liff.login({
+          redirectUri:
+            window.location.href,
+        });
+        return;
+      }
 
-    if (comment.trim()) {
-      parameters.set(
-        "comment",
-        comment.trim(),
+      const idToken = liff.getIDToken();
+
+      if (!idToken) {
+        setSubmitError(
+          getParticipationErrorMessage(
+            401,
+          ),
+        );
+        return;
+      }
+
+      const response = await fetch(
+        "/api/participations",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+          body: JSON.stringify({
+            idToken,
+            farmId,
+            workType,
+            timeCategory,
+            ...(comment.trim()
+              ? {
+                  comment:
+                    comment.trim(),
+                }
+              : {}),
+          }),
+        },
       );
+
+      const responseBody: unknown =
+        await response.json();
+
+      if (!response.ok) {
+        setSubmitError(
+          getParticipationErrorMessage(
+            response.status,
+          ),
+        );
+        return;
+      }
+
+      const participation =
+        parseParticipationResponse(
+          responseBody,
+        );
+
+      if (!participation) {
+        setSubmitError(
+          getParticipationErrorMessage(
+            502,
+          ),
+        );
+        return;
+      }
+
+      saveCompletedParticipation(
+        window.sessionStorage,
+        participation,
+      );
+
+      router.push("/check-in/complete");
+    } catch {
+      setSubmitError(
+        getParticipationErrorMessage(
+          502,
+        ),
+      );
+    } finally {
+      setIsSubmitting(false);
     }
-
-    window.setTimeout(() => {
-      router.push(
-        `/check-in/complete?${parameters.toString()}`,
-      );
-    }, mockDelayMilliseconds);
   }
 
   return (
@@ -266,7 +391,10 @@ export default function CheckInPage() {
           noValidate
           aria-busy={isSubmitting}
         >
-          <fieldset className="fieldset">
+          <fieldset
+            className="fieldset"
+            disabled={isSubmitting}
+          >
             <legend className="legend">
               参加内容
             </legend>
@@ -276,10 +404,49 @@ export default function CheckInPage() {
                 農園
               </label>
 
+              {farmListStatus ===
+                "loading" && (
+                <p
+                  id="farm-list-status"
+                  className="field-help"
+                  role="status"
+                >
+                  農園情報を読み込んでいます…
+                </p>
+              )}
+
+              {farmListStatus ===
+                "error" && (
+                <p
+                  id="farm-list-error"
+                  className="error-text"
+                  role="alert"
+                >
+                  農園情報を取得できませんでした。
+                  ページを再読み込みしてください。
+                </p>
+              )}
+
+              {farmListStatus === "ready" &&
+                activeFarms.length === 0 && (
+                  <p
+                    id="farm-list-empty"
+                    className="field-help"
+                    role="status"
+                  >
+                    現在、参加を受け付けている
+                    農園はありません。
+                  </p>
+                )}
+
               <select
                 id="farmId"
                 name="farmId"
                 value={farmId}
+                disabled={
+                  farmListStatus !== "ready" ||
+                  activeFarms.length === 0
+                }
                 aria-describedby={
                   errors.farmId
                     ? "farmId-error"
@@ -358,62 +525,18 @@ export default function CheckInPage() {
             )}
 
             <div className="field-row">
-              <label htmlFor="workDate">
+              <p className="field-label">
                 作業日
-              </label>
-
-              <div className="date-input-wrapper">
-                <input
-                  id="workDate"
-                  name="workDate"
-                  type="date"
-                  value={workDate}
-                  max={getTodayInJapan()}
-                  aria-describedby={
-                    errors.workDate
-                      ? "workDate-error workDate-help"
-                      : "workDate-help"
-                  }
-                  aria-invalid={
-                    Boolean(errors.workDate)
-                  }
-                  onChange={(event) => {
-                    setWorkDate(
-                      event.target.value,
-                    );
-
-                    setErrors((current) => ({
-                      ...current,
-                      workDate: undefined,
-                    }));
-                  }}
-                />
-
-                <span
-                  className="date-input-icon"
-                  aria-hidden="true"
-                >
-                  📅
-                </span>
-              </div>
-
-              <p
-                id="workDate-help"
-                className="field-help"
-              >
-                初期値は日本時間の当日です。
-                過去日または当日を選択できます。
               </p>
 
-              {errors.workDate && (
-                <p
-                  id="workDate-error"
-                  className="error-text"
-                  role="alert"
-                >
-                  {errors.workDate}
-                </p>
-              )}
+              <p className="work-date-display">
+                <strong>{workDate}</strong>
+              </p>
+
+              <p className="field-help">
+                作業日は登録時にサーバーが
+                日本時間で確定します。
+              </p>
             </div>
 
             <div className="field-row">
@@ -655,10 +778,23 @@ export default function CheckInPage() {
             </p>
           )}
 
+          {submitError && (
+            <p
+              className="error-text"
+              role="alert"
+            >
+              {submitError}
+            </p>
+          )}
+
           <button
             type="submit"
             className="primary-button"
-            disabled={isSubmitting}
+            disabled={
+              isSubmitting ||
+              farmListStatus !== "ready" ||
+              activeFarms.length === 0
+            }
           >
             {isSubmitting
               ? "参加を記録しています…"

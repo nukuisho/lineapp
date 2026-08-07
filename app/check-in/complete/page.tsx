@@ -1,93 +1,41 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
-import { ParticipationStamps } from "../../../src/components/participation-stamps";
+import {
+  useEffect,
+  useState,
+} from "react";
 import {
   formatJapaneseDate,
-  getFarmById,
-  getTodayInJapan,
-  isValidTimeCategory,
-  isValidWorkType,
-  mockUser,
 } from "../../../src/lib/mock-data";
-import { addPrototypeParticipation } from "../../../src/lib/prototype-storage";
+import {
+  readCompletedParticipation,
+  type RegisteredParticipation,
+} from "../../../src/lib/participation-response";
 
-function CompletePageContent() {
-  const searchParams = useSearchParams();
-
-  const [isSaved, setIsSaved] =
-    useState(false);
-
-  const registrationId =
-    searchParams.get("registrationId") ??
-    "";
-
-  const farmId =
-    searchParams.get("farmId") ?? "";
-
-  const farm = getFarmById(farmId);
-
-  const workDate =
-    searchParams.get("workDate") ||
-    getTodayInJapan();
-
-  const rawWorkType =
-    searchParams.get("workType") ?? "";
-
-  const rawTimeCategory =
-    searchParams.get(
-      "timeCategory",
-    ) ?? "";
-
-  const comment =
-    searchParams.get("comment")?.trim() ??
-    "";
-
-  const workType =
-    isValidWorkType(rawWorkType)
-      ? rawWorkType
-      : null;
-
-  const timeCategory =
-    isValidTimeCategory(
-      rawTimeCategory,
-    )
-      ? rawTimeCategory
-      : null;
+export default function CompletePage() {
+  const [
+    participation,
+    setParticipation,
+  ] = useState<
+    | RegisteredParticipation
+    | null
+    | undefined
+  >(undefined);
 
   useEffect(() => {
-    if (
-      !registrationId ||
-      !farm ||
-      !workType ||
-      !timeCategory ||
-      !workDate
-    ) {
-      return;
-    }
+    const completedParticipation =
+      readCompletedParticipation(
+        window.sessionStorage,
+      );
 
-    const saved =
-      addPrototypeParticipation({
-        id: registrationId,
-        farmId: farm.id,
-        farmName: farm.name,
-        workDate,
-        workType,
-        timeCategory,
-        comment:
-          comment || undefined,
-        createdAt:
-          new Date().toISOString(),
-      });
-
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- Reflect the completed prototype storage write.
-    setIsSaved(true);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- sessionStorage is available only after the client mounts.
+    setParticipation(
+      completedParticipation,
+    );
 
     if (
-      saved &&
-      typeof navigator !== "undefined" &&
+      completedParticipation &&
       "vibrate" in navigator
     ) {
       navigator.vibrate([
@@ -96,31 +44,26 @@ function CompletePageContent() {
         120,
       ]);
     }
-  }, [
-    registrationId,
-    farmId,
-    farm,
-    workDate,
-    workType,
-    timeCategory,
-    comment,
-  ]);
+  }, []);
 
-  const storedVisitCount =
-    isSaved
-      ? mockUser.totalVisits + 1
-      : mockUser.totalVisits;
-
-  const hasValidRegistration =
-    Boolean(
-      registrationId &&
-      farm &&
-      workType &&
-      timeCategory &&
-      workDate,
+  if (participation === undefined) {
+    return (
+      <main>
+        <div className="page">
+          <section className="card">
+            <p
+              role="status"
+              aria-live="polite"
+            >
+              登録内容を読み込んでいます…
+            </p>
+          </section>
+        </div>
+      </main>
     );
+  }
 
-  if (!hasValidRegistration) {
+  if (!participation) {
     return (
       <main>
         <div className="page">
@@ -179,20 +122,25 @@ function CompletePageContent() {
           <ul className="summary-list record-summary">
             <li>
               <span>農園</span>
-              <strong>{farm?.name}</strong>
+              <strong>
+                {participation.farm.name}
+              </strong>
             </li>
 
             <li>
               <span>農家</span>
               <strong>
-                {farm?.ownerName}
+                {
+                  participation.farm
+                    .ownerName
+                }
               </strong>
             </li>
 
             <li>
               <span>作物</span>
               <strong>
-                {farm?.fruitTypes.join(
+                {participation.farm.fruitTypes.join(
                   "・",
                 )}
               </strong>
@@ -202,27 +150,43 @@ function CompletePageContent() {
               <span>作業日</span>
               <strong>
                 {formatJapaneseDate(
-                  workDate,
+                  participation.workDate,
                 )}
               </strong>
             </li>
 
             <li>
               <span>作業内容</span>
-              <strong>{workType}</strong>
+              <strong>
+                {participation.workType}
+              </strong>
             </li>
 
             <li>
               <span>作業時間</span>
               <strong>
-                {timeCategory}
+                {
+                  participation.timeCategory
+                }
               </strong>
             </li>
 
-            {comment && (
+            <li>
+              <span>獲得スタンプ</span>
+              <strong>
+                {
+                  participation.stampsGranted
+                }
+                個
+              </strong>
+            </li>
+
+            {participation.comment && (
               <li className="summary-comment">
                 <span>コメント</span>
-                <strong>{comment}</strong>
+                <strong>
+                  {participation.comment}
+                </strong>
               </li>
             )}
           </ul>
@@ -232,22 +196,8 @@ function CompletePageContent() {
             role="status"
             aria-live="polite"
           >
-            {isSaved
-              ? "参加記録を保存しました。"
-              : "参加記録を保存しています…"}
+            参加記録を保存しました。
           </p>
-
-          <p className="prototype-note">
-            この記録はUI試作用として、
-            現在のブラウザ内だけに
-            保存されています。
-          </p>
-        </section>
-
-        <section className="card">
-          <ParticipationStamps
-            count={storedVisitCount}
-          />
         </section>
 
         <section className="card">
@@ -269,23 +219,5 @@ function CompletePageContent() {
         </section>
       </div>
     </main>
-  );
-}
-
-export default function CompletePage() {
-  return (
-    <Suspense
-      fallback={
-        <main className="page-shell">
-          <div className="content">
-            <p role="status">
-              完了画面を読み込んでいます…
-            </p>
-          </div>
-        </main>
-      }
-    >
-      <CompletePageContent />
-    </Suspense>
   );
 }
