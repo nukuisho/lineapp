@@ -1958,3 +1958,36 @@ textarea:focus-visible {
   color: #62665d !important;
   white-space: pre-wrap;
 }
+
+/* スマートフォンのSafari・LINE内ブラウザで日付入力が横にはみ出すことを防ぐ */
+.check-in-form,
+.check-in-form .fieldset,
+.check-in-form .field-row {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.date-input-wrapper {
+  overflow: hidden;
+}
+
+.date-input-wrapper input[type="date"] {
+  box-sizing: border-box;
+  inline-size: 100%;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.date-input-wrapper
+  input[type="date"]::-webkit-date-and-time-value {
+  min-width: 0;
+  text-align: left;
+}
+
+.date-input-wrapper
+  input[type="date"]::-webkit-datetime-edit {
+  min-width: 0;
+}
