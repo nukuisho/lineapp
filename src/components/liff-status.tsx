@@ -11,6 +11,10 @@ import {
   initializeLiff,
 } from "../lib/line/liff";
 import {
+  getLiffInitDiagnosticCode,
+  type LiffInitDiagnosticCode,
+} from "../lib/line/liff-init-diagnostic";
+import {
   getLineDisplayName,
 } from "../lib/line/profile";
 
@@ -53,6 +57,8 @@ type LiffState =
     }
   | {
       status: "error";
+      diagnosticCode:
+        LiffInitDiagnosticCode;
     };
 
 export function LiffStatus() {
@@ -141,13 +147,17 @@ export function LiffStatus() {
           verification,
         });
       },
-      () => {
+      (error: unknown) => {
         if (!isActive) {
           return;
         }
 
         setState({
           status: "error",
+          diagnosticCode:
+            getLiffInitDiagnosticCode(
+              error,
+            ),
         });
       },
     );
@@ -192,6 +202,11 @@ export function LiffStatus() {
           ページを再読み込みしてください。
           解決しない場合は、時間をおいて
           もう一度お試しください。
+        </p>
+
+        <p className="prototype-note">
+          診断コード：
+          {state.diagnosticCode}
         </p>
       </div>
     );
