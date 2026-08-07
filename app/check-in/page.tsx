@@ -298,10 +298,9 @@ export default function CheckInPage() {
       const liff = await initializeLiff();
 
       if (!liff.isLoggedIn()) {
-        liff.login({
-          redirectUri:
-            window.location.href,
-        });
+        setSubmitError(
+          "LINEアプリ内の参加登録画面から、もう一度お試しください。",
+        );
         return;
       }
 
