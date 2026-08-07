@@ -13,6 +13,7 @@ import {
 type ParticipationRequest = {
   idToken: string;
   farmId: string;
+  workDate: string;
   workType: string;
   timeCategory: string;
   comment?: string;
@@ -37,6 +38,8 @@ function parseRequestBody(
     !value.idToken.trim() ||
     typeof value.farmId !== "string" ||
     !value.farmId.trim() ||
+    typeof value.workDate !== "string" ||
+    !value.workDate.trim() ||
     typeof value.workType !== "string" ||
     typeof value.timeCategory !== "string" ||
     ("comment" in value &&
@@ -48,6 +51,7 @@ function parseRequestBody(
   return {
     idToken: value.idToken,
     farmId: value.farmId,
+    workDate: value.workDate,
     workType: value.workType,
     timeCategory: value.timeCategory,
     ...(typeof value.comment === "string"
@@ -110,6 +114,7 @@ export async function POST(
     const result = await registerParticipation({
       userId: user.userId,
       farmId: input.farmId,
+      workDate: input.workDate,
       workType: input.workType,
       timeCategory: input.timeCategory,
       ...(input.comment === undefined
@@ -175,7 +180,7 @@ export async function POST(
       if (error.code === "duplicate") {
         return errorResponse(
           409,
-          "本日のこの農園への参加は、すでに記録されています。",
+          "この作業日のこの農園への参加は、すでに記録されています。",
         );
       }
 

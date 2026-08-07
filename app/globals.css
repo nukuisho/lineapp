@@ -1799,9 +1799,16 @@ textarea:focus-visible {
 /* カレンダー入力 */
 .date-input-wrapper {
   position: relative;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .date-input-wrapper input[type="date"] {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   min-height: 52px;
   padding:
     11px 46px 11px 13px;
@@ -1950,4 +1957,109 @@ textarea:focus-visible {
   border-top: 1px solid #e4dfcd;
   color: #62665d !important;
   white-space: pre-wrap;
+}
+
+/* スマートフォンのSafari・LINE内ブラウザで日付入力が横にはみ出すことを防ぐ */
+.check-in-form,
+.check-in-form .fieldset,
+.check-in-form .field-row {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.date-input-wrapper {
+  overflow: hidden;
+}
+
+.date-input-wrapper input[type="date"] {
+  box-sizing: border-box;
+  inline-size: 100%;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.date-input-wrapper
+  input[type="date"]::-webkit-date-and-time-value {
+  min-width: 0;
+  text-align: left;
+}
+
+.date-input-wrapper
+  input[type="date"]::-webkit-datetime-edit {
+  min-width: 0;
+}
+
+/* iOS Safari・LINE内ブラウザの日付入力が持つ内部最小幅をラッパー内へ収める */
+.date-input-wrapper {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  height: 52px;
+  overflow: hidden;
+  contain: inline-size;
+  border: 1px solid #ddd4b7;
+  border-radius: 13px;
+  background: #ffffff;
+}
+
+.date-input-wrapper:hover {
+  border-color: #d2bb5b;
+}
+
+.date-input-wrapper:focus-within {
+  border-color: #b99416;
+  outline: 3px solid
+    rgba(128, 95, 16, 0.42);
+  outline-offset: 3px;
+}
+
+.date-input-wrapper input[type="date"] {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  padding:
+    11px 46px 11px 13px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+  outline: 0;
+  background: transparent;
+  font-size: 16px;
+  line-height: 1.4;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.date-input-wrapper
+  input[type="date"]:focus,
+.date-input-wrapper
+  input[type="date"]:focus-visible {
+  border: 0;
+  outline: 0;
+}
+
+.date-input-wrapper
+  input[type="date"]::-webkit-date-and-time-value {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-align: left;
+}
+
+.date-input-wrapper
+  input[type="date"]::-webkit-datetime-edit {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
 }
