@@ -158,6 +158,58 @@ main {
   background: var(--color-primary);
 }
 
+.line-status-card {
+  padding: 10px 14px;
+  border: 1px solid #cfdcc9;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: var(--shadow-small);
+}
+
+.line-status-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  color: var(--color-success);
+  font-size: 0.88rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.line-status-row.is-error {
+  color: var(--color-error);
+}
+
+.line-status-dot {
+  flex: 0 0 auto;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--color-success);
+}
+
+.line-status-dot.is-pending {
+  background: var(--color-primary-dark);
+}
+
+.line-status-dot.is-error {
+  background: var(--color-error);
+}
+
+.line-status-name {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--color-text);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.line-status-note {
+  color: var(--color-text-soft);
+  font-weight: 600;
+}
+
 /* ヘッダー */
 .hero {
   position: relative;
@@ -233,6 +285,13 @@ main {
   font-size: 0.94rem;
 }
 
+.summary-error {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 14px;
+}
+
 .stats-grid {
   display: grid;
   grid-template-columns:
@@ -242,6 +301,7 @@ main {
 }
 
 .stat-pill {
+  margin: 0;
   padding: 13px 10px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-medium);
@@ -1597,15 +1657,6 @@ input:hover {
   font-size: 0.75rem;
 }
 
-.notice-line-status {
-  padding: 4px 8px;
-  border-radius: 999px;
-  background: #edf5e9;
-  color: #496247;
-  font-weight: 700;
-  text-align: right;
-}
-
 /* 参加登録フォーム */
 .check-in-form {
   display: flex;
@@ -1774,11 +1825,6 @@ textarea:focus-visible {
   .notice-meta {
     align-items: stretch;
     flex-direction: column;
-  }
-
-  .notice-line-status {
-    align-self: flex-start;
-    text-align: left;
   }
 
   .field-help-between {
