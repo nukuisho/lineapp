@@ -27,7 +27,7 @@ export function ParticipationStamps({
         </p>
 
         <h2 id="participation-card-title">
-          参加の記録
+          スタンプ
         </h2>
 
         <p className="modern-stamp-description">
@@ -35,16 +35,24 @@ export function ParticipationStamps({
         </p>
       </div>
 
-      <div className="stats-grid">
-        <p className="stat-pill">
-          <strong>{normalizedParticipations}回</strong>
-          <span>累計参加回数</span>
-        </p>
-        <p className="stat-pill">
-          <strong>{normalizedStamps}個</strong>
-          <span>累計スタンプ数</span>
-        </p>
+      <div
+        className="modern-stamp"
+        role="img"
+        aria-label={`累計スタンプ数、現在${normalizedStamps}個`}
+      >
+        <span className="modern-stamp-number">
+          {normalizedStamps}
+        </span>
+
+        <span className="modern-stamp-unit">
+          個
+        </span>
       </div>
+
+      <p className="stat-pill participation-count-summary">
+        <strong>{normalizedParticipations}回</strong>
+        <span>累計参加回数</span>
+      </p>
     </section>
   );
 }

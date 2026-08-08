@@ -269,6 +269,11 @@ main {
   font-size: 0.83rem;
 }
 
+.participation-count-summary {
+  max-width: 220px;
+  margin: 14px auto 0;
+}
+
 /* ボタン */
 .link-button,
 .primary-button,

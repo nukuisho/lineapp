@@ -165,7 +165,11 @@ export default function HomePage() {
           className="card"
           aria-labelledby="user-summary-title"
         >
-          <h2 id="user-summary-title">あなたの参加記録</h2>
+          <h2 id="user-summary-title">
+            {status === "ready" && displayName
+              ? `${displayName}さん の参加記録`
+              : "あなたの参加記録"}
+          </h2>
 
           {status === "loading" && (
             <p className="welcome-message" role="status">
@@ -193,7 +197,7 @@ export default function HomePage() {
           {status === "ready" && summary && (
             <>
               <p className="welcome-message">
-                {displayName}さん、いつもありがとうございます！
+                いつもありがとうございます！
               </p>
               <ParticipationStamps
                 totalParticipations={summary.totalParticipations}
