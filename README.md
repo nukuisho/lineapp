@@ -16,6 +16,7 @@
 - /check-in: 参加登録画面
 - /check-in/complete: 登録完了画面
 - /history: 参加履歴画面
+- /operator: 運営者情報画面
 - /error: エラー画面
 ## 開発環境
 
