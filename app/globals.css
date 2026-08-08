@@ -1657,15 +1657,6 @@ input:hover {
   font-size: 0.75rem;
 }
 
-.notice-line-status {
-  padding: 4px 8px;
-  border-radius: 999px;
-  background: #edf5e9;
-  color: #496247;
-  font-weight: 700;
-  text-align: right;
-}
-
 /* 参加登録フォーム */
 .check-in-form {
   display: flex;
@@ -1710,10 +1701,8 @@ textarea:focus-visible {
   font-size: 0.78rem;
 }
 
-.field-help-between {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
+.comment-length {
+  text-align: right;
 }
 
 .selected-farm {
@@ -1834,16 +1823,6 @@ textarea:focus-visible {
   .notice-meta {
     align-items: stretch;
     flex-direction: column;
-  }
-
-  .notice-line-status {
-    align-self: flex-start;
-    text-align: left;
-  }
-
-  .field-help-between {
-    flex-direction: column;
-    gap: 3px;
   }
 
   .summary-comment {

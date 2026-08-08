@@ -18,8 +18,6 @@ const mockNotice = {
   body:
     "暑い日が続いています。作業時は飲み物と帽子をご持参ください。",
   publishedAt: "2026年8月2日",
-  lineNotificationStatus:
-    "LINE通知は次の開発段階で対応予定です",
 };
 
 export default function HomePage() {
@@ -149,10 +147,6 @@ export default function HomePage() {
               <time>
                 {mockNotice.publishedAt}
               </time>
-
-              <span className="notice-line-status">
-                {mockNotice.lineNotificationStatus}
-              </span>
             </div>
           </article>
         </section>
