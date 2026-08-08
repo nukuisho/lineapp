@@ -2151,12 +2151,12 @@ textarea:focus-visible {
   content: "";
   position: absolute;
   z-index: 0;
-  top: 10px;
-  right: 6px;
-  bottom: 6px;
+  top: 18px;
+  right: -34px;
+  bottom: -18px;
   display: block;
-  width: 46%;
-  background-image: url("/545.png");
+  width: 50%;
+  background-image: url("/1180.png");
   background-repeat: no-repeat;
   background-position: right bottom;
   background-size: contain;
@@ -2167,12 +2167,13 @@ textarea:focus-visible {
 .hero h1,
 .hero h2,
 .hero p {
-  max-width: 62%;
+  max-width: 100%;
 }
 
 @media (max-width: 360px) {
   .hero::after {
-    right: 2px;
-    width: 44%;
+    right: -28px;
+    bottom: -14px;
+    width: 48%;
   }
 }
