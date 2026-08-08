@@ -158,6 +158,58 @@ main {
   background: var(--color-primary);
 }
 
+.line-status-card {
+  padding: 10px 14px;
+  border: 1px solid #cfdcc9;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: var(--shadow-small);
+}
+
+.line-status-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  color: var(--color-success);
+  font-size: 0.88rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.line-status-row.is-error {
+  color: var(--color-error);
+}
+
+.line-status-dot {
+  flex: 0 0 auto;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--color-success);
+}
+
+.line-status-dot.is-pending {
+  background: var(--color-primary-dark);
+}
+
+.line-status-dot.is-error {
+  background: var(--color-error);
+}
+
+.line-status-name {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--color-text);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.line-status-note {
+  color: var(--color-text-soft);
+  font-weight: 600;
+}
+
 /* ヘッダー */
 .hero {
   position: relative;
