@@ -111,13 +111,9 @@ export default function HomePage() {
         </section>
 
         <section
-          className="card"
-          aria-labelledby="line-status-title"
+          className="line-status-card"
+          aria-label="LINE連携状態"
         >
-          <h2 id="line-status-title">
-            LINE連携状態
-          </h2>
-
           <LiffStatus />
         </section>
 
