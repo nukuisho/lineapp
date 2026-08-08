@@ -1,19 +1,13 @@
 type ParticipationStampsProps = {
   totalParticipations: number;
-  totalStamps: number;
 };
 
 export function ParticipationStamps({
   totalParticipations,
-  totalStamps,
 }: ParticipationStampsProps) {
   const normalizedParticipations = Math.max(
     0,
     Math.floor(totalParticipations),
-  );
-  const normalizedStamps = Math.max(
-    0,
-    Math.floor(totalStamps),
   );
 
   return (
@@ -27,7 +21,7 @@ export function ParticipationStamps({
         </p>
 
         <h2 id="participation-card-title">
-          スタンプ
+          参加回数
         </h2>
 
         <p className="modern-stamp-description">
@@ -38,21 +32,16 @@ export function ParticipationStamps({
       <div
         className="modern-stamp"
         role="img"
-        aria-label={`累計スタンプ数、現在${normalizedStamps}個`}
+        aria-label={`参加回数、現在${normalizedParticipations}回`}
       >
         <span className="modern-stamp-number">
-          {normalizedStamps}
+          {normalizedParticipations}
         </span>
 
         <span className="modern-stamp-unit">
-          個
+          回
         </span>
       </div>
-
-      <p className="stat-pill participation-count-summary">
-        <strong>{normalizedParticipations}回</strong>
-        <span>累計参加回数</span>
-      </p>
     </section>
   );
 }

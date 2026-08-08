@@ -201,7 +201,6 @@ export default function HomePage() {
               </p>
               <ParticipationStamps
                 totalParticipations={summary.totalParticipations}
-                totalStamps={summary.totalStamps}
               />
             </>
           )}
