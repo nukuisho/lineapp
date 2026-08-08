@@ -173,3 +173,22 @@ FirebaseプロジェクトはPoCのDevelopment用とProduction用を分離し、
 `POST /api/participations/history`は、ブラウザから受け取ったLINE IDトークンをサーバー側で再検証し、検証結果から生成した内部ユーザーIDに一致する参加履歴だけをFirestoreから取得する。クライアントからユーザーIDは受け取らず、IDトークン、LINEユーザーID、内部ユーザーID、Firestore内部エラーはブラウザへ返さない。
 
 参加履歴画面はLIFF SDKからIDトークンを取得してこのAPIを呼び出し、読み込み中、履歴なし、取得失敗の状態を表示する。Firestoreの外部データとAPIレスポンスは実行時検証し、有効な履歴を作業日の新しい順で最大50件表示する。
+
+## PoC利用者データのリセット
+
+運営者用の`npm run reset:poc-user`は、指定した内部ユーザーの参加履歴、重複登録防止キー、参加回数・スタンプ数をFirestore Transactionで一体的にリセットする。通常はdry-runとなり、対象プロジェクトと同じ値を`--confirm-project`へ明示した場合だけ更新する。
+
+受付中にリセットすると同時登録と競合するため、対象農園の受付を一時停止してから実行する。最初はDevelopment環境でdry-runと実行結果を確認し、Productionでは削除対象とバックアップ方針を確認してから使用する。
+
+```bash
+npm run reset:poc-user -- \
+  --project development-project-id \
+  --user-id internal-user-id
+
+npm run reset:poc-user -- \
+  --project development-project-id \
+  --user-id internal-user-id \
+  --confirm-project development-project-id
+```
+
+実際のプロジェクトID、内部ユーザーID、Firebase秘密情報はチャット、ログ、Git管理対象ファイルへ記載しない。
