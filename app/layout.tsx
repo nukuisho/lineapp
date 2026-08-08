@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "援農パスポート",
-  description: "援農ボランティア参加管理LINEアプリの第1段階UI試作品",
+  description: "援農ボランティアの参加記録アプリ(非公式)",
 };
 
 export default function RootLayout({

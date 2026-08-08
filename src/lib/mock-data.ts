@@ -1,10 +1,3 @@
-export const mockUser = {
-  id: "user-001",
-  displayName: "稲城 太郎",
-  pictureUrl: null as string | null,
-  totalVisits: 7,
-};
-
 export const mockFarm = {
   id: "farm-001",
   name: "川崎果樹園",

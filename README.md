@@ -8,7 +8,7 @@
 - Firebase Admin SDKをNext.jsのサーバー処理だけで使用し、検証済みLINEユーザーをFirestoreへ保存します。
 - 参加登録画面は、Firestoreの受付中農園一覧と参加登録APIへ接続しています。
 - 参加履歴画面は、LINE IDトークンで確認した本人の参加履歴をFirestoreから取得します。
-- ホーム画面の集計値には、引き続きUI確認用のダミーデータが残っています。
+- ホーム画面は、LINE表示名と本人のFirestore集計値を安全に取得して表示します。
 
 ## 確認できる画面
 
@@ -16,6 +16,7 @@
 - /check-in: 参加登録画面
 - /check-in/complete: 登録完了画面
 - /history: 参加履歴画面
+- /operator: 運営者情報画面
 - /error: エラー画面
 ## 開発環境
 
@@ -92,12 +93,45 @@ Next.jsを更新する際は、次を再確認する。
 ## 制約
 
 - 参加登録はFirestoreへ保存しますが、任意写真はプレビューだけで保存しません。
-- ホーム画面の集計値は、まだFirestoreへ接続していません。
-- 次段階では、ホーム画面の集計値取得を実装します。
+- ホーム画面のお知らせは、引き続きUI確認用のダミーデータです。
 
-## LINEプロフィールのPoC表示
+## 本人限定のホーム集計API
 
-ログイン済みの場合、LIFF SDKの`getProfile()`から取得したLINE表示名をホーム画面へ仮表示する。
+`POST /api/users/me/summary`は、LINE IDトークンをサーバー側で再検証し、検証済みLINEユーザーから生成した内部ユーザーIDに一致する`users`ドキュメントだけを取得する。クライアントからユーザーIDは受け取らず、LINE IDトークン、各ユーザーID、Firestore内部エラーはレスポンスへ返さない。
+
+ホーム画面では`liff.getProfile()`の表示名を実行時検証して表示専用に使い、本人確認には使わない。集計APIレスポンスも実行時検証し、累計参加回数と累計スタンプ数を分けて表示する。ホーム画面を開くたびに取得するため、参加登録後に戻った場合も最新値を表示する。
+
+## PoC利用者データのリセット
+
+運営者用の`npm run reset:poc-user`は、指定した内部ユーザーの参加履歴、重複登録防止キー、参加回数・スタンプ数をFirestore Transactionで一体的にリセットする。通常はdry-runとなり、対象プロジェクトと同じ値を`--confirm-project`へ明示した場合だけ更新する。
+
+受付中にリセットすると同時登録と競合するため、対象農園の受付を一時停止してから実行する。最初はDevelopment環境でdry-runと実行結果を確認し、Productionでは削除対象とバックアップ方針を確認してから使用する。
+
+```bash
+npm run reset:poc-user -- \
+  --project development-project-id \
+  --user-id internal-user-id
+
+npm run reset:poc-user -- \
+  --project development-project-id \
+  --user-id internal-user-id \
+  --confirm-project development-project-id
+```
+
+実際のプロジェクトID、内部ユーザーID、Firebase秘密情報はチャット、ログ、Git管理対象ファイルへ記載しない。
+
+本人限定のレスポンスはブラウザや共有キャッシュへ保存されないよう、成功時と失敗時の両方で`Cache-Control: private, no-store`を返す。
+
+PreviewおよびProductionでの実機確認では、次を確認する。
+
+- 異なるLINEアカウントで開いたとき、それぞれ本人の集計だけが表示される
+- `users`ドキュメントが未作成の場合、参加回数とスタンプ数がともに0で表示される
+- 参加登録後にホームへ戻ったとき、最新の参加回数とスタンプ数が表示される
+- 通信失敗時に内部情報を含まない案内と再試行ボタンが表示される
+
+## LINEプロフィール表示
+
+ログイン済みの場合、LIFF SDKの`getProfile()`から取得したLINE表示名をホーム画面へ表示する。ホーム画面に固定のモックユーザー名は使用しない。
 
 表示名は実行時に文字列かつ空でないことを検証するが、本人確認、認可、FirestoreのドキュメントID、参加履歴の所有者判定には使用しない。
 

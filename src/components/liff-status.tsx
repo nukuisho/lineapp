@@ -169,135 +169,62 @@ export function LiffStatus() {
 
   if (state.status === "initializing") {
     return (
-      <p
-        className="save-status"
+      <div
+        className="line-status-row"
         role="status"
         aria-live="polite"
       >
-        LINE連携を準備しています…
-      </p>
+        <span className="line-status-dot is-pending" aria-hidden="true" />
+        <span>LINE連携を準備しています…</span>
+      </div>
     );
   }
 
   if (state.status === "verifying") {
     return (
-      <p
-        className="save-status"
+      <div
+        className="line-status-row"
         role="status"
         aria-live="polite"
       >
-        LINEアカウントを確認しています…
-      </p>
+        <span className="line-status-dot is-pending" aria-hidden="true" />
+        <span>LINEアカウントを確認しています…</span>
+      </div>
     );
   }
 
   if (state.status === "error") {
     return (
-      <div role="alert">
-        <p className="save-status">
-          LINE連携を開始できませんでした。
-        </p>
-
-        <p className="prototype-note">
-          ページを再読み込みしてください。
-          解決しない場合は、時間をおいて
-          もう一度お試しください。
-        </p>
-
-        <p className="prototype-note">
-          診断コード：
-          {state.diagnosticCode}
-        </p>
+      <div className="line-status-row is-error" role="alert">
+        <span className="line-status-dot is-error" aria-hidden="true" />
+        <span>
+          LINE連携を確認できません。ページを再読み込みしてください。
+        </span>
       </div>
     );
   }
 
   return (
     <div
+      className="line-status-row"
       role="status"
       aria-live="polite"
     >
-      <p className="save-status">
-        LINE連携の準備ができました。
-      </p>
-
-      <p className="prototype-note">
-        {state.isInClient
-          ? "LINEアプリ内で開いています。"
-          : "LINEアプリ外で開いています。"}
-      </p>
-
-      <p className="prototype-note">
-        {state.isLoggedIn
-          ? "LINEにログイン済みです。"
-          : "LINEにログインしていません。"}
-      </p>
-
-      <div>
-        <p className="prototype-note">
-          LINE本人確認
-        </p>
-
-        {state.verification.status ===
-          "verified" && (
-          <p className="save-status">
-            サーバーで本人確認できました。
-          </p>
-        )}
-
-        {state.verification.status ===
-          "not-logged-in" && (
-          <p className="prototype-note">
-            LINEへログインすると
-            本人確認を行います。
-          </p>
-        )}
-
-        {state.verification.status ===
-          "unavailable" && (
-          <div role="alert">
-            <p className="save-status">
-              LINEアカウントを
-              確認できませんでした。
-            </p>
-
-            <p className="prototype-note">
-              ページを再読み込みしてください。
-              解決しない場合は、時間をおいて
-              もう一度お試しください。
-            </p>
-          </div>
-        )}
-      </div>
+      <span className="line-status-dot" aria-hidden="true" />
+      <span>LINE連携済み</span>
 
       {state.profile.status ===
         "available" && (
-        <div>
-          <p className="prototype-note">
-            LINEプロフィール（PoC表示）
-          </p>
-
-          <p className="save-status">
-            {state.profile.displayName}さん
-          </p>
-
-          <p className="prototype-note">
-            この表示名は本人確認には
-            使用していません。
-          </p>
-        </div>
+        <strong className="line-status-name">
+          {state.profile.displayName}さん
+        </strong>
       )}
 
       {state.profile.status ===
         "unavailable" && (
-        <p
-          className="prototype-note"
-          role="alert"
-        >
-          LINEプロフィールを
-          表示できませんでした。
-          ページを再読み込みしてください。
-        </p>
+        <span className="line-status-note">
+          ユーザー名を確認できません
+        </span>
       )}
     </div>
   );

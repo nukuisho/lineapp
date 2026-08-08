@@ -16,6 +16,9 @@ import {
 import {
   initializeLiff,
 } from "../../src/lib/line/liff";
+import {
+  parseUserSummaryResponse,
+} from "../../src/lib/user-summary-api";
 
 type HistoryStatus =
   | "loading"
@@ -32,6 +35,9 @@ export default function HistoryPage() {
 
   const [status, setStatus] =
     useState<HistoryStatus>("loading");
+
+  const [totalParticipations, setTotalParticipations] =
+    useState(0);
 
   const [
     errorMessage,
@@ -73,9 +79,7 @@ export default function HistoryPage() {
           return;
         }
 
-        const response = await fetch(
-          "/api/participations/history",
-          {
+        const requestOptions = {
             method: "POST",
             headers: {
               "Content-Type":
@@ -86,19 +90,29 @@ export default function HistoryPage() {
             }),
             cache: "no-store",
             signal: controller.signal,
-          },
-        );
+          } as const;
 
-        const responseBody: unknown =
-          await response.json();
+        const [response, summaryResponse] = await Promise.all([
+          fetch("/api/participations/history", requestOptions),
+          fetch("/api/users/me/summary", requestOptions),
+        ]);
+
+        const [responseBody, summaryBody]: [unknown, unknown] =
+          await Promise.all([
+            response.json(),
+            summaryResponse.json(),
+          ]);
 
         const history = response.ok
           ? parseHistoryResponse(
               responseBody,
             )
           : null;
+        const summary = summaryResponse.ok
+          ? parseUserSummaryResponse(summaryBody)
+          : null;
 
-        if (!history) {
+        if (!history || !summary) {
           if (isActive) {
             setErrorMessage(
               getHistoryErrorMessage(
@@ -114,6 +128,7 @@ export default function HistoryPage() {
 
         if (isActive) {
           setParticipations(history);
+          setTotalParticipations(summary.totalParticipations);
           setStatus("ready");
         }
       } catch (error) {
@@ -166,6 +181,13 @@ export default function HistoryPage() {
           <h2 id="history-list-title">
             これまでの参加
           </h2>
+
+          {status === "ready" && (
+            <p className="history-total">
+              累計参加回数：
+              <strong>{totalParticipations}回</strong>
+            </p>
+          )}
 
           {status === "loading" && (
             <p role="status">
