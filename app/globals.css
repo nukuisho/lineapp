@@ -443,6 +443,48 @@ input:hover {
   margin-top: 14px;
 }
 
+.operator-info-link {
+  align-self: center;
+  padding: 4px;
+  color: var(--color-text-soft);
+  font-size: 0.82rem;
+  text-decoration: underline;
+  text-decoration-color: rgba(113, 105, 87, 0.45);
+  text-underline-offset: 3px;
+}
+
+.operator-card p {
+  margin: 12px 0 0;
+  color: var(--color-text-soft);
+}
+
+.operator-details {
+  display: grid;
+  gap: 13px;
+  margin: 14px 0 0;
+}
+
+.operator-details div {
+  padding-bottom: 13px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.operator-details div:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.operator-details dt {
+  color: var(--color-text-soft);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.operator-details dd {
+  margin: 3px 0 0;
+  font-weight: 700;
+}
+
 .list-item {
   padding: 13px 14px;
   border: 1px solid var(--color-border);
@@ -2101,4 +2143,16 @@ textarea:focus-visible {
   min-width: 0;
   max-width: 100%;
   overflow: hidden;
+}
+
+/* ヘッダーキャラクターは運用方針の確定まで非表示 */
+.hero::after {
+  display: none;
+  content: none;
+}
+
+.hero h1,
+.hero h2,
+.hero p {
+  max-width: 100%;
 }
