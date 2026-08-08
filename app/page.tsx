@@ -218,15 +218,15 @@ export default function HomePage() {
             >
               参加履歴を見る
             </Link>
-
-            <Link
-              href="/operator"
-              className="operator-info-link"
-            >
-              運営者情報
-            </Link>
           </div>
         </section>
+
+        <Link
+          href="/operator"
+          className="operator-info-link"
+        >
+          運営者情報
+        </Link>
       </div>
     </main>
   );
