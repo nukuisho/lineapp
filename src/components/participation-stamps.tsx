@@ -1,11 +1,20 @@
 type ParticipationStampsProps = {
-  count: number;
+  totalParticipations: number;
+  totalStamps: number;
 };
 
 export function ParticipationStamps({
-  count,
+  totalParticipations,
+  totalStamps,
 }: ParticipationStampsProps) {
-  const normalizedCount = Math.max(0, Math.floor(count));
+  const normalizedParticipations = Math.max(
+    0,
+    Math.floor(totalParticipations),
+  );
+  const normalizedStamps = Math.max(
+    0,
+    Math.floor(totalStamps),
+  );
 
   return (
     <section
@@ -26,32 +35,15 @@ export function ParticipationStamps({
         </p>
       </div>
 
-      <div
-        className="modern-stamp"
-        role="img"
-        aria-label={`累計参加回数、現在${normalizedCount}回`}
-      >
-        <span
-          className="modern-stamp-top"
-          aria-hidden="true"
-        >
-          THANK YOU
-        </span>
-
-        <span className="modern-stamp-number">
-          {normalizedCount}
-        </span>
-
-        <span className="modern-stamp-unit">
-          回
-        </span>
-
-        <span
-          className="modern-stamp-decoration"
-          aria-hidden="true"
-        >
-          INAGI ORCHARD
-        </span>
+      <div className="stats-grid">
+        <p className="stat-pill">
+          <strong>{normalizedParticipations}回</strong>
+          <span>累計参加回数</span>
+        </p>
+        <p className="stat-pill">
+          <strong>{normalizedStamps}個</strong>
+          <span>累計スタンプ数</span>
+        </p>
       </div>
     </section>
   );

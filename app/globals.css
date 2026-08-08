@@ -233,6 +233,13 @@ main {
   font-size: 0.94rem;
 }
 
+.summary-error {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 14px;
+}
+
 .stats-grid {
   display: grid;
   grid-template-columns:
@@ -242,6 +249,7 @@ main {
 }
 
 .stat-pill {
+  margin: 0;
   padding: 13px 10px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-medium);
