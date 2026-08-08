@@ -221,71 +221,11 @@ export function LiffStatus() {
         LINE連携の準備ができました。
       </p>
 
-      <p className="prototype-note">
-        {state.isInClient
-          ? "LINEアプリ内で開いています。"
-          : "LINEアプリ外で開いています。"}
-      </p>
-
-      <p className="prototype-note">
-        {state.isLoggedIn
-          ? "LINEにログイン済みです。"
-          : "LINEにログインしていません。"}
-      </p>
-
-      <div>
-        <p className="prototype-note">
-          LINE本人確認
-        </p>
-
-        {state.verification.status ===
-          "verified" && (
-          <p className="save-status">
-            サーバーで本人確認できました。
-          </p>
-        )}
-
-        {state.verification.status ===
-          "not-logged-in" && (
-          <p className="prototype-note">
-            LINEへログインすると
-            本人確認を行います。
-          </p>
-        )}
-
-        {state.verification.status ===
-          "unavailable" && (
-          <div role="alert">
-            <p className="save-status">
-              LINEアカウントを
-              確認できませんでした。
-            </p>
-
-            <p className="prototype-note">
-              ページを再読み込みしてください。
-              解決しない場合は、時間をおいて
-              もう一度お試しください。
-            </p>
-          </div>
-        )}
-      </div>
-
       {state.profile.status ===
         "available" && (
-        <div>
-          <p className="prototype-note">
-            LINEプロフィール（PoC表示）
-          </p>
-
-          <p className="save-status">
-            {state.profile.displayName}さん
-          </p>
-
-          <p className="prototype-note">
-            この表示名は本人確認には
-            使用していません。
-          </p>
-        </div>
+        <p className="save-status">
+          {state.profile.displayName}さん
+        </p>
       )}
 
       {state.profile.status ===

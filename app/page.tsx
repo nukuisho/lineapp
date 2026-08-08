@@ -4,8 +4,13 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { LiffStatus } from "../src/components/liff-status";
 import { ParticipationStamps } from "../src/components/participation-stamps";
-import { mockUser } from "../src/lib/mock-data";
-import { getPrototypeParticipations } from "../src/lib/prototype-storage";
+import { getLineDisplayName } from "../src/lib/line/profile";
+import { initializeLiff } from "../src/lib/line/liff";
+import {
+  getUserSummaryErrorMessage,
+  parseUserSummaryResponse,
+  type UserSummary,
+} from "../src/lib/user-summary-api";
 
 const mockNotice = {
   id: "notice-001",
@@ -18,19 +23,75 @@ const mockNotice = {
 };
 
 export default function HomePage() {
-  const [totalVisits, setTotalVisits] =
-    useState(mockUser.totalVisits);
+  const [displayName, setDisplayName] = useState("");
+  const [summary, setSummary] = useState<UserSummary | null>(null);
+  const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [retryKey, setRetryKey] = useState(0);
 
   useEffect(() => {
-    const savedParticipations =
-      getPrototypeParticipations();
+    const controller = new AbortController();
+    let isActive = true;
 
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- Restore prototype data from browser storage after hydration.
-    setTotalVisits(
-      mockUser.totalVisits +
-        savedParticipations.length,
-    );
-  }, []);
+    async function loadSummary() {
+      try {
+        const liff = await initializeLiff();
+
+        if (!liff.isLoggedIn()) {
+          liff.login({ redirectUri: window.location.href });
+          return;
+        }
+
+        const [profile, idToken] = await Promise.all([
+          liff.getProfile(),
+          Promise.resolve(liff.getIDToken()),
+        ]);
+        const validatedDisplayName = getLineDisplayName(profile);
+
+        if (!validatedDisplayName || !idToken) {
+          throw new Error("LINE profile is unavailable.");
+        }
+
+        const response = await fetch("/api/users/me/summary", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ idToken }),
+          cache: "no-store",
+          signal: controller.signal,
+        });
+        const responseBody: unknown = await response.json();
+        const parsedSummary = response.ok
+          ? parseUserSummaryResponse(responseBody)
+          : null;
+
+        if (!parsedSummary) {
+          if (isActive) {
+            setErrorMessage(getUserSummaryErrorMessage(response.status));
+            setStatus("error");
+          }
+          return;
+        }
+
+        if (isActive) {
+          setDisplayName(validatedDisplayName);
+          setSummary(parsedSummary);
+          setStatus("ready");
+        }
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+        if (isActive) {
+          setErrorMessage(getUserSummaryErrorMessage(502));
+          setStatus("error");
+        }
+      }
+    }
+
+    void loadSummary();
+    return () => {
+      isActive = false;
+      controller.abort();
+    };
+  }, [retryKey]);
 
   return (
     <main>
@@ -105,16 +166,44 @@ export default function HomePage() {
           aria-labelledby="user-summary-title"
         >
           <h2 id="user-summary-title">
-            {mockUser.displayName}さん
+            {status === "ready" && displayName
+              ? `${displayName}さん の参加記録`
+              : "あなたの参加記録"}
           </h2>
 
-          <p className="welcome-message">
-            いつもありがとうございます！
-          </p>
+          {status === "loading" && (
+            <p className="welcome-message" role="status">
+              LINEプロフィールと参加記録を読み込んでいます…
+            </p>
+          )}
 
-          <ParticipationStamps
-            count={totalVisits}
-          />
+          {status === "error" && (
+            <div className="summary-error">
+              <p className="error-text" role="alert">{errorMessage}</p>
+              <button
+                type="button"
+                className="secondary-button"
+                onClick={() => {
+                  setStatus("loading");
+                  setErrorMessage("");
+                  setRetryKey((key) => key + 1);
+                }}
+              >
+                もう一度読み込む
+              </button>
+            </div>
+          )}
+
+          {status === "ready" && summary && (
+            <>
+              <p className="welcome-message">
+                いつもありがとうございます！
+              </p>
+              <ParticipationStamps
+                totalParticipations={summary.totalParticipations}
+              />
+            </>
+          )}
         </section>
 
         <section
