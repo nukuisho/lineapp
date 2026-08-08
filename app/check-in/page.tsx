@@ -753,13 +753,8 @@ export default function CheckInPage() {
 
               <div
                 id="comment-help"
-                className="field-help field-help-between"
+                className="field-help comment-length"
               >
-                <span>
-                  入力したコメントは、
-                  次段階で参加履歴に保存します。
-                </span>
-
                 <span>
                   {comment.length}/
                   {maximumCommentLength}
@@ -797,7 +792,7 @@ export default function CheckInPage() {
                 id="photo-help"
                 className="field-help"
               >
-                UI試作品のため、写真は
+                試作品のため、写真は
                 まだ保存されません。
               </p>
 
